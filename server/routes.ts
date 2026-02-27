@@ -24,6 +24,12 @@ function requireAuth(req: Request, res: Response, next: NextFunction) {
   next();
 }
 
+function safeError(res: Response, status: number, e: any) {
+  const isProduction = process.env.NODE_ENV === "production";
+  const message = isProduction && status >= 500 ? "Внутренняя ошибка сервера" : e.message;
+  return res.status(status).json({ message });
+}
+
 export async function registerRoutes(
   httpServer: Server,
   app: Express
@@ -34,29 +40,22 @@ export async function registerRoutes(
   app.get("/", (_req, res) => {
     res.sendFile(servePath.resolve(clientDir, "landing.html"));
   });
+  const isProduction = process.env.NODE_ENV === "production";
+
   app.use(
     session({
-      secret: process.env.SESSION_SECRET || "woodini-admin-secret-key-2025",
+      secret: process.env.SESSION_SECRET!,
       resave: false,
       saveUninitialized: false,
       store: new MemoryStore({ checkPeriod: 86400000 }),
       cookie: {
         maxAge: 24 * 60 * 60 * 1000,
         httpOnly: true,
-        secure: false,
+        secure: isProduction,
         sameSite: "lax",
       },
     })
   );
-
-  async function ensureAdminExists() {
-    const admin = await storage.getUserByUsername("admin");
-    if (!admin) {
-      const hash = await bcrypt.hash("admin123", 10);
-      await storage.createUser({ username: "admin", password: hash });
-    }
-  }
-  await ensureAdminExists();
 
   app.post("/api/auth/login", async (req, res) => {
     try {
@@ -66,9 +65,9 @@ export async function registerRoutes(
         return res.status(401).json({ message: "Неверный логин или пароль" });
       }
       (req.session as any).userId = user.id;
-      res.json({ id: user.id, username: user.username });
+      res.json({ id: user.id, username: user.username, mustChangePassword: user.mustChangePassword });
     } catch (e: any) {
-      res.status(500).json({ message: e.message });
+      safeError(res, 500, e);
     }
   });
 
@@ -83,22 +82,25 @@ export async function registerRoutes(
     if (!userId) return res.status(401).json({ message: "Не авторизован" });
     const user = await storage.getUser(userId);
     if (!user) return res.status(401).json({ message: "Не авторизован" });
-    res.json({ id: user.id, username: user.username });
+    res.json({ id: user.id, username: user.username, mustChangePassword: user.mustChangePassword });
   });
 
   app.post("/api/auth/change-password", requireAuth, async (req, res) => {
     try {
       const { currentPassword, newPassword } = req.body;
+      if (!newPassword || newPassword.length < 6) {
+        return res.status(400).json({ message: "Пароль должен быть не менее 6 символов" });
+      }
       const userId = (req.session as any).userId;
       const user = await storage.getUser(userId);
       if (!user || !(await bcrypt.compare(currentPassword, user.password))) {
         return res.status(400).json({ message: "Неверный текущий пароль" });
       }
-      const hash = await bcrypt.hash(newPassword, 10);
+      const hash = await bcrypt.hash(newPassword, 12);
       await storage.updateUserPassword(user.id, hash);
       res.json({ ok: true });
     } catch (e: any) {
-      res.status(500).json({ message: e.message });
+      safeError(res, 500, e);
     }
   });
 
@@ -112,7 +114,7 @@ export async function registerRoutes(
       });
       res.json({ ok: true });
     } catch (e: any) {
-      res.status(500).json({ message: e.message });
+      safeError(res, 500, e);
     }
   });
 
@@ -317,7 +319,7 @@ export async function registerRoutes(
     try {
       res.json(await storage.getVisitStats());
     } catch (e: any) {
-      res.status(500).json({ message: e.message });
+      safeError(res, 500, e);
     }
   });
 
@@ -343,7 +345,7 @@ export async function registerRoutes(
         fs.writeFileSync(pricePath, buffer);
         res.json({ ok: true, size: buffer.length });
       } catch (e: any) {
-        res.status(500).json({ message: e.message });
+        safeError(res, 500, e);
       }
     });
   });
@@ -372,7 +374,7 @@ export async function registerRoutes(
         await storage.updatePartner(Number(req.params.id), { logoUrl });
         res.json({ ok: true, logoUrl });
       } catch (e: any) {
-        res.status(500).json({ message: e.message });
+        safeError(res, 500, e);
       }
     });
   });

@@ -4,6 +4,14 @@ import { serveStatic } from "./static";
 import { createServer } from "http";
 import path from "path";
 
+const requiredEnvVars = ["DATABASE_URL", "SESSION_SECRET"];
+for (const envVar of requiredEnvVars) {
+  if (!process.env[envVar]) {
+    console.error(`FATAL: переменная окружения ${envVar} не задана. Сервер не может запуститься.`);
+    process.exit(1);
+  }
+}
+
 const app = express();
 const httpServer = createServer(app);
 
@@ -68,15 +76,21 @@ app.use((req, res, next) => {
 
   app.use((err: any, _req: Request, res: Response, next: NextFunction) => {
     const status = err.status || err.statusCode || 500;
-    const message = err.message || "Internal Server Error";
+    const isProduction = process.env.NODE_ENV === "production";
 
-    console.error("Internal Server Error:", err);
+    if (!isProduction) {
+      console.error("Internal Server Error:", err);
+    } else {
+      console.error("Internal Server Error:", err.message);
+    }
 
     if (res.headersSent) {
       return next(err);
     }
 
-    return res.status(status).json({ message });
+    return res.status(status).json({
+      message: isProduction ? "Внутренняя ошибка сервера" : (err.message || "Internal Server Error"),
+    });
   });
 
   if (process.env.NODE_ENV === "production") {

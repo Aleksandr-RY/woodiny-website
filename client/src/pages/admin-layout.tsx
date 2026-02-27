@@ -6,9 +6,10 @@ import { useMutation } from "@tanstack/react-query";
 import {
   LayoutDashboard, MessageSquare, Package, Handshake,
   Star, Users, Newspaper, Phone, Search, BarChart3,
-  LogOut, Menu, X, Trees, PenTool
+  LogOut, Menu, X, PenTool
 } from "lucide-react";
 import { useState } from "react";
+const logoPath = "/woodiny-icon.png";
 
 const navItems = [
   { path: "/admin", label: "Дашборд", icon: LayoutDashboard },
@@ -47,12 +48,17 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     },
   });
 
+  if (!isLoading && user?.mustChangePassword) {
+    window.location.href = "/admin/login";
+    return null;
+  }
+
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="flex flex-col items-center gap-3">
-          <div className="w-10 h-10 rounded-md bg-primary flex items-center justify-center animate-pulse">
-            <Trees className="h-5 w-5 text-primary-foreground" />
+          <div className="w-10 h-10 rounded-md flex items-center justify-center animate-pulse">
+            <img src={logoPath} alt="WOODINY" className="h-8 w-8 object-contain" />
           </div>
           <p className="text-sm text-muted-foreground">Загрузка...</p>
         </div>
@@ -73,8 +79,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         ${mobileOpen ? "translate-x-0" : "-translate-x-full"}
       `}>
         <div className="flex items-center gap-3 h-14 px-4 border-b border-sidebar-border">
-          <div className="w-8 h-8 rounded-md bg-primary flex items-center justify-center shrink-0">
-            <Trees className="h-4 w-4 text-primary-foreground" />
+          <div className="w-8 h-8 rounded-md flex items-center justify-center shrink-0">
+            <img src={logoPath} alt="WOODINY" className="h-7 w-7 object-contain" />
           </div>
           <Link href="/admin" className="font-bold text-lg text-sidebar-foreground" data-testid="link-admin-home">
             ВУДИНИ

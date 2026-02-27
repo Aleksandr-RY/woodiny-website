@@ -18,10 +18,11 @@ B2B website for ВУДИНИ — a wooden products manufacturer in Moscow Oblast
 - `server/db.ts` — Database connection (Neon serverless)
 - `server/storage.ts` — Data access layer (DatabaseStorage class)
 - `server/routes.ts` — API routes with session-based auth + public content API
-- `server/index.ts` — Express server setup, serves static files from client/ dir (index:false), landing.html at `/`
+- `server/index.ts` — Express server setup with env var validation, serves static files from client/ dir (index:false), landing.html at `/`
 - `client/src/App.tsx` — React router with all admin pages
 - `client/src/pages/admin-*.tsx` — Admin panel pages
 - `client/src/pages/admin-site-editor.tsx` — Section content editor (hero, clients, stats, capabilities, etc.)
+- `scripts/create-admin.ts` — CLI script to create admin user with bcrypt-hashed password
 
 ## Admin Panel Features
 1. **Dashboard** — Overview of all data counts
@@ -43,20 +44,28 @@ B2B website for ВУДИНИ — a wooden products manufacturer in Moscow Oblast
 - Landing page JS fetches content and replaces DOM elements on load
 - Admin editor at `/admin/editor` provides forms for each section
 
+## Security
+- No default credentials — admin created via CLI: `npx tsx scripts/create-admin.ts <login> <password>`
+- Passwords hashed with bcrypt (salt 12)
+- First login forces password change (`mustChangePassword` flag)
+- SESSION_SECRET and DATABASE_URL required at startup (server exits if missing)
+- Production mode: `secure: true` cookies, `sameSite: lax`, no stack traces in error responses
+- `.env` excluded from Git via `.gitignore`
+
 ## Admin Login
 - URL: `/admin/login`
-- Default credentials: `admin` / `admin123`
 - Session-based authentication with express-session
 
 ## Dependencies
-- Express, Drizzle ORM, @neondatabase/serverless
+- Express, Drizzle ORM, pg (node-postgres)
 - bcryptjs (password hashing), express-session, memorystore
 - React, wouter, @tanstack/react-query, shadcn/ui, Tailwind CSS
 
 ## Deployment
 - Build: `npm run build`
 - Run: `npm run start`
-- Configured as autoscale deployment
+- See `DEPLOY_REGRU.md` for full VPS deployment guide
+- `.env.example` provided as template
 
 ## User Preferences
 - All communication in Russian
