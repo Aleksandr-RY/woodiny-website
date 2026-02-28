@@ -35,7 +35,10 @@ export async function registerRoutes(
   app: Express
 ): Promise<Server> {
   const servePath = await import("path");
+  const expressStatic = await import("express");
   const clientDir = servePath.resolve(process.cwd(), "client");
+
+  app.use(expressStatic.default.static(clientDir, { index: false }));
 
   app.get("/", (_req, res) => {
     res.sendFile(servePath.resolve(clientDir, "landing.html"));
