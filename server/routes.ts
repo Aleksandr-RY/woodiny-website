@@ -42,20 +42,27 @@ export async function registerRoutes(
   });
   const isProduction = process.env.NODE_ENV === "production";
 
-  app.use(
-    session({
-      secret: process.env.SESSION_SECRET!,
-      resave: false,
-      saveUninitialized: false,
-      store: new MemoryStore({ checkPeriod: 86400000 }),
-      cookie: {
-        maxAge: 24 * 60 * 60 * 1000,
-        httpOnly: true,
-        secure: "auto" as any,
-        sameSite: "lax",
-      },
-    })
-  );
+  const sessionMiddleware = session({
+    secret: process.env.SESSION_SECRET!,
+    resave: false,
+    saveUninitialized: false,
+    store: new MemoryStore({ checkPeriod: 86400000 }),
+    cookie: {
+      maxAge: 24 * 60 * 60 * 1000,
+      httpOnly: true,
+      secure: false,
+      sameSite: "lax",
+    },
+  });
+
+  app.use((req, res, next) => {
+    sessionMiddleware(req, res, () => {
+      if (isProduction && (req.secure || req.headers["x-forwarded-proto"] === "https")) {
+        req.session.cookie.secure = true;
+      }
+      next();
+    });
+  });
 
   app.post("/api/auth/login", async (req, res) => {
     try {
