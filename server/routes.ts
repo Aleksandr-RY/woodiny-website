@@ -61,11 +61,16 @@ export async function registerRoutes(
   app: Express
 ): Promise<Server> {
   const clientDir = path.resolve(process.cwd(), "client");
+  const isProduction = process.env.NODE_ENV === "production";
 
   app.get("/", (_req, res) => {
-    res.sendFile(path.resolve(clientDir, "landing.html"));
+    // In production, landing.html is built into dist/public/ via client/public/.
+    // __dirname points to dist/ when running the bundled server.
+    const landingPath = isProduction
+      ? path.resolve(__dirname, "public", "landing.html")
+      : path.resolve(clientDir, "landing.html");
+    res.sendFile(landingPath);
   });
-  const isProduction = process.env.NODE_ENV === "production";
 
   app.use(
     session({
