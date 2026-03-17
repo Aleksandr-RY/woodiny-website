@@ -70,18 +70,20 @@ app.use((req, res, next) => {
 });
 
 (async () => {
-  const clientDir = path.resolve(process.cwd(), "client");
+  // In production the bundled server sits in dist/index.cjs, so __dirname = dist/.
+  // path.resolve(__dirname, "../client") always resolves correctly regardless of cwd.
+  // In dev we use process.cwd() because __dirname is the ts source directory.
+  const isProduction = process.env.NODE_ENV === "production";
+  const clientDir = isProduction
+    ? path.resolve(__dirname, "..", "client")
+    : path.resolve(process.cwd(), "client");
 
-  const staticMiddleware = express.static(clientDir, { index: false });
-
-  if (process.env.NODE_ENV === "production") {
-    app.use(staticMiddleware);
-  } else {
-    // In dev: skip static for /src/* so Vite handles TS/TSX transpilation.
-    // express.static would serve raw .ts/.tsx with wrong MIME type.
+  if (!isProduction) {
+    // Dev: skip /src/* so Vite can transpile TS/TSX with the correct MIME type.
+    const devStatic = express.static(clientDir, { index: false });
     app.use((req, res, next) => {
       if (req.path.startsWith("/src/")) return next();
-      staticMiddleware(req, res, next);
+      devStatic(req, res, next);
     });
   }
 
