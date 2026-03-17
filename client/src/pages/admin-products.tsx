@@ -6,11 +6,17 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel,
+  AlertDialogContent, AlertDialogDescription, AlertDialogFooter,
+  AlertDialogHeader, AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { Plus, Pencil, Trash2, PackageOpen } from "lucide-react";
+import { ImageUpload } from "@/components/image-upload";
 import type { Product } from "@shared/schema";
 
 function ProductForm({ product, onDone }: { product?: Product; onDone: () => void }) {
@@ -58,8 +64,11 @@ function ProductForm({ product, onDone }: { product?: Product; onDone: () => voi
         </div>
       </div>
       <div>
-        <label className="text-sm font-medium mb-1.5 block">URL изображения</label>
-        <Input data-testid="input-product-image" placeholder="https://..." value={form.imageUrl} onChange={(e) => setForm({ ...form, imageUrl: e.target.value })} />
+        <label className="text-sm font-medium mb-1.5 block">Изображение</label>
+        <ImageUpload
+          value={form.imageUrl}
+          onChange={(url) => setForm({ ...form, imageUrl: url })}
+        />
       </div>
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
@@ -83,13 +92,16 @@ export default function AdminProducts() {
   const { data: products, isLoading } = useQuery<Product[]>({ queryKey: ["/api/products"] });
   const [editProduct, setEditProduct] = useState<Product | null>(null);
   const [addOpen, setAddOpen] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState<Product | null>(null);
 
   const deleteMutation = useMutation({
     mutationFn: (id: number) => apiRequest("DELETE", `/api/products/${id}`),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/products"] });
       toast({ title: "Товар удалён" });
+      setDeleteTarget(null);
     },
+    onError: () => toast({ title: "Ошибка удаления", variant: "destructive" }),
   });
 
   if (isLoading) return <div className="space-y-4">{[1,2,3].map(i => <Skeleton key={i} className="h-20 w-full rounded-md" />)}</div>;
@@ -105,12 +117,13 @@ export default function AdminProducts() {
           <DialogTrigger asChild>
             <Button data-testid="button-add-product"><Plus className="mr-2 h-4 w-4" />Добавить</Button>
           </DialogTrigger>
-          <DialogContent>
+          <DialogContent className="max-h-[90vh] overflow-y-auto">
             <DialogHeader><DialogTitle>Новый товар</DialogTitle></DialogHeader>
             <ProductForm onDone={() => setAddOpen(false)} />
           </DialogContent>
         </Dialog>
       </div>
+
       {!products?.length ? (
         <Card>
           <CardContent className="flex flex-col items-center justify-center py-16 text-center">
@@ -145,12 +158,17 @@ export default function AdminProducts() {
                         <Pencil className="h-4 w-4" />
                       </Button>
                     </DialogTrigger>
-                    <DialogContent>
+                    <DialogContent className="max-h-[90vh] overflow-y-auto">
                       <DialogHeader><DialogTitle>Редактировать товар</DialogTitle></DialogHeader>
                       <ProductForm product={editProduct || p} onDone={() => setEditProduct(null)} />
                     </DialogContent>
                   </Dialog>
-                  <Button variant="ghost" size="icon" onClick={() => deleteMutation.mutate(p.id)} data-testid={`button-delete-product-${p.id}`}>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => setDeleteTarget(p)}
+                    data-testid={`button-delete-product-${p.id}`}
+                  >
                     <Trash2 className="h-4 w-4 text-destructive" />
                   </Button>
                 </div>
@@ -159,6 +177,27 @@ export default function AdminProducts() {
           ))}
         </div>
       )}
+
+      <AlertDialog open={!!deleteTarget} onOpenChange={() => setDeleteTarget(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Удалить товар?</AlertDialogTitle>
+            <AlertDialogDescription>
+              «{deleteTarget?.name}» будет удалён безвозвратно.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Отмена</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              onClick={() => deleteTarget && deleteMutation.mutate(deleteTarget.id)}
+              disabled={deleteMutation.isPending}
+            >
+              {deleteMutation.isPending ? "Удаление..." : "Удалить"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

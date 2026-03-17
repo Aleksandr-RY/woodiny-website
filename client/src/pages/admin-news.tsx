@@ -3,15 +3,20 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel,
+  AlertDialogContent, AlertDialogDescription, AlertDialogFooter,
+  AlertDialogHeader, AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { Plus, Pencil, Trash2, Calendar, FileText } from "lucide-react";
+import { RichTextEditor } from "@/components/rich-text-editor";
 import type { News } from "@shared/schema";
 
 function NewsForm({ item, onDone }: { item?: News; onDone: () => void }) {
@@ -32,6 +37,7 @@ function NewsForm({ item, onDone }: { item?: News; onDone: () => void }) {
       toast({ title: item ? "Обновлено" : "Добавлено" });
       onDone();
     },
+    onError: (e: any) => toast({ title: "Ошибка", description: e.message, variant: "destructive" }),
   });
 
   return (
@@ -42,7 +48,12 @@ function NewsForm({ item, onDone }: { item?: News; onDone: () => void }) {
       </div>
       <div>
         <label className="text-sm font-medium mb-1.5 block">Содержание</label>
-        <Textarea data-testid="input-news-content" placeholder="Текст публикации..." rows={6} value={form.content} onChange={(e) => setForm({ ...form, content: e.target.value })} required />
+        <RichTextEditor
+          value={form.content}
+          onChange={(v) => setForm({ ...form, content: v })}
+          placeholder="Текст публикации..."
+          minHeight="250px"
+        />
       </div>
       <div>
         <label className="text-sm font-medium mb-1.5 block">Категория</label>
@@ -70,13 +81,16 @@ export default function AdminNews() {
   const { toast } = useToast();
   const { data: newsList, isLoading } = useQuery<News[]>({ queryKey: ["/api/news"] });
   const [addOpen, setAddOpen] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState<News | null>(null);
 
   const deleteMutation = useMutation({
     mutationFn: (id: number) => apiRequest("DELETE", `/api/news/${id}`),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/news"] });
       toast({ title: "Удалено" });
+      setDeleteTarget(null);
     },
+    onError: () => toast({ title: "Ошибка удаления", variant: "destructive" }),
   });
 
   if (isLoading) return <Skeleton className="h-40 w-full rounded-md" />;
@@ -94,7 +108,7 @@ export default function AdminNews() {
           <DialogTrigger asChild>
             <Button data-testid="button-add-news"><Plus className="mr-2 h-4 w-4" />Добавить</Button>
           </DialogTrigger>
-          <DialogContent>
+          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
             <DialogHeader><DialogTitle>Новая публикация</DialogTitle></DialogHeader>
             <NewsForm onDone={() => setAddOpen(false)} />
           </DialogContent>
@@ -122,7 +136,10 @@ export default function AdminNews() {
                       </Badge>
                       <Badge variant="outline">{catLabels[n.category || "news"] || n.category}</Badge>
                     </div>
-                    <p className="text-sm text-muted-foreground line-clamp-2 leading-relaxed">{n.content}</p>
+                    <p
+                      className="text-sm text-muted-foreground line-clamp-2 leading-relaxed"
+                      dangerouslySetInnerHTML={{ __html: n.content.replace(/<[^>]+>/g, " ").trim() }}
+                    />
                     {n.createdAt && (
                       <span className="flex items-center gap-1.5 text-xs text-muted-foreground mt-2">
                         <Calendar className="h-3 w-3" />
@@ -135,12 +152,17 @@ export default function AdminNews() {
                       <DialogTrigger asChild>
                         <Button variant="ghost" size="icon" data-testid={`button-edit-news-${n.id}`}><Pencil className="h-4 w-4" /></Button>
                       </DialogTrigger>
-                      <DialogContent>
+                      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
                         <DialogHeader><DialogTitle>Редактировать</DialogTitle></DialogHeader>
                         <NewsForm item={n} onDone={() => {}} />
                       </DialogContent>
                     </Dialog>
-                    <Button variant="ghost" size="icon" onClick={() => deleteMutation.mutate(n.id)} data-testid={`button-delete-news-${n.id}`}>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => setDeleteTarget(n)}
+                      data-testid={`button-delete-news-${n.id}`}
+                    >
                       <Trash2 className="h-4 w-4 text-destructive" />
                     </Button>
                   </div>
@@ -150,6 +172,27 @@ export default function AdminNews() {
           ))}
         </div>
       )}
+
+      <AlertDialog open={!!deleteTarget} onOpenChange={() => setDeleteTarget(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Удалить публикацию?</AlertDialogTitle>
+            <AlertDialogDescription>
+              «{deleteTarget?.title}» будет удалена безвозвратно.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Отмена</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              onClick={() => deleteTarget && deleteMutation.mutate(deleteTarget.id)}
+              disabled={deleteMutation.isPending}
+            >
+              {deleteMutation.isPending ? "Удаление..." : "Удалить"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

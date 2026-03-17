@@ -6,6 +6,7 @@ import bcrypt from "bcryptjs";
 import { storage } from "./storage";
 import fs from "fs";
 import path from "path";
+import multer from "multer";
 import {
   insertInquirySchema,
   insertProductSchema,
@@ -16,6 +17,31 @@ import {
 } from "@shared/schema";
 
 const MemoryStore = createMemoryStore(session);
+
+const UPLOADS_DIR = path.resolve(process.cwd(), "client", "uploads");
+if (!fs.existsSync(UPLOADS_DIR)) fs.mkdirSync(UPLOADS_DIR, { recursive: true });
+
+const multerStorage = multer.diskStorage({
+  destination: (_req, _file, cb) => cb(null, UPLOADS_DIR),
+  filename: (_req, file, cb) => {
+    const ext = path.extname(file.originalname).toLowerCase() || ".jpg";
+    const name = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}${ext}`;
+    cb(null, name);
+  },
+});
+
+const upload = multer({
+  storage: multerStorage,
+  limits: { fileSize: 5 * 1024 * 1024 },
+  fileFilter: (_req, file, cb) => {
+    const allowed = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
+    if (allowed.includes(file.mimetype)) {
+      cb(null, true);
+    } else {
+      cb(new Error("Допустимые форматы: JPG, JPEG, PNG, WEBP"));
+    }
+  },
+});
 
 function requireAuth(req: Request, res: Response, next: NextFunction) {
   if (!(req.session as any).userId) {
@@ -311,7 +337,7 @@ export async function registerRoutes(
 
   app.put("/api/settings/:key", requireAuth, async (req, res) => {
     try {
-      const item = await storage.upsertSetting(req.params.key, req.body.value, req.body.category);
+      const item = await storage.upsertSetting(String(req.params.key), req.body.value, req.body.category);
       res.json(item);
     } catch (e: any) {
       res.status(400).json({ message: e.message });
@@ -389,6 +415,63 @@ export async function registerRoutes(
       res.json({ exists: true, size: stat.size, modified: stat.mtime });
     } catch {
       res.json({ exists: false });
+    }
+  });
+
+  app.post("/api/upload", requireAuth, (req, res) => {
+    upload.single("image")(req, res, (err) => {
+      if (err instanceof multer.MulterError) {
+        if (err.code === "LIMIT_FILE_SIZE") {
+          return res.status(413).json({ message: "Файл слишком большой (макс. 5 МБ)" });
+        }
+        return res.status(400).json({ message: err.message });
+      }
+      if (err) {
+        return res.status(400).json({ message: err.message || "Ошибка загрузки" });
+      }
+      if (!req.file) {
+        return res.status(400).json({ message: "Файл не получен" });
+      }
+      const url = `/uploads/${req.file.filename}`;
+      res.json({ url });
+    });
+  });
+
+  app.get("/api/media", requireAuth, (_req, res) => {
+    try {
+      if (!fs.existsSync(UPLOADS_DIR)) {
+        return res.json([]);
+      }
+      const files = fs.readdirSync(UPLOADS_DIR)
+        .filter(f => /\.(jpg|jpeg|png|webp|gif|svg)$/i.test(f))
+        .map(f => {
+          const filePath = path.join(UPLOADS_DIR, f);
+          const stat = fs.statSync(filePath);
+          return {
+            filename: f,
+            url: `/uploads/${f}`,
+            size: stat.size,
+            createdAt: stat.birthtime.toISOString(),
+          };
+        })
+        .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+      res.json(files);
+    } catch (e: any) {
+      safeError(res, 500, e);
+    }
+  });
+
+  app.delete("/api/media/:filename", requireAuth, (req, res) => {
+    try {
+      const filename = path.basename(String(req.params.filename));
+      const filePath = path.join(UPLOADS_DIR, filename);
+      if (!fs.existsSync(filePath)) {
+        return res.status(404).json({ message: "Файл не найден" });
+      }
+      fs.unlinkSync(filePath);
+      res.json({ ok: true });
+    } catch (e: any) {
+      safeError(res, 500, e);
     }
   });
 

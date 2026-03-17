@@ -17,6 +17,7 @@ import AdminSettings from "@/pages/admin-settings";
 import AdminSEO from "@/pages/admin-seo";
 import AdminStats from "@/pages/admin-stats";
 import AdminSiteEditor from "@/pages/admin-site-editor";
+import AdminMedia from "@/pages/admin-media";
 
 function AdminPage({ children }: { children: React.ReactNode }) {
   return <AdminLayout>{children}</AdminLayout>;
@@ -55,6 +56,9 @@ function Router() {
       </Route>
       <Route path="/admin/stats">
         <AdminPage><AdminStats /></AdminPage>
+      </Route>
+      <Route path="/admin/media">
+        <AdminPage><AdminMedia /></AdminPage>
       </Route>
       <Route path="/admin/editor">
         <AdminPage><AdminSiteEditor /></AdminPage>
