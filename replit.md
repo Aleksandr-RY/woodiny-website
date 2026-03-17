@@ -1,27 +1,30 @@
 # ВУДИНИ (Woodini) — B2B Website
 
 ## Overview
-B2B website for ВУДИНИ — a wooden products manufacturer in Moscow Oblast. The site features a large static HTML landing page plus a React-based admin panel for content management.
+B2B website for ВУДИНИ — a wooden products manufacturer in Moscow Oblast. The site features a React-based landing page (matching original HTML design) plus an admin panel for content management. Both are served by Express/Vite.
 
 ## Architecture
-- **Main Site**: Static HTML file at `client/landing.html` served via Express at `/`
+- **Main Site**: React SPA (`client/src/pages/landing.tsx`) at `/`, served by React Router via Vite. Uses **custom CSS** (`client/src/landing.css`) matching original `landing.html` design — NOT Tailwind
+- **CMS**: Content blocks stored in `blocks` table, fetched via `/api/blocks`. Landing page reads block `data` JSON field
 - **Admin Panel**: React SPA at `/admin/*` routes, built with Vite + React + Tailwind CSS + shadcn/ui
 - **Backend**: Express.js with PostgreSQL database via Drizzle ORM
 - **Database**: PostgreSQL (Neon serverless driver)
-- **Content System**: Section content stored as JSON in `siteSettings` table (category="content"), injected into landing page via `/api/content` endpoint and JavaScript
 
 ## Key Files
-- `client/landing.html` — Main B2B landing page (~2500+ lines of HTML/CSS/JS) with data-content attributes for dynamic content
+- `client/landing.html` — Original static HTML (reference only, not served)
+- `client/src/pages/landing.tsx` — React landing page, uses CSS classes from `landing.css`
+- `client/src/landing.css` — Full custom design system (CSS variables: `--primary: #2C1D0E`, `--accent: #C4975A`, Inter font, all section styles)
 - `client/hero-video-*.mp4` — Hero section background videos (4 videos)
 - `client/production-*.png`, `client/hero-*.png` — Production and hero images
-- `shared/schema.ts` — Database schema (users, inquiries, products, partners, reviews, staff, news, siteSettings, pageVisits)
+- `shared/schema.ts` — Database schema (users, inquiries, products, partners, reviews, staff, news, siteSettings, pageVisits, blocks, portfolio)
 - `server/db.ts` — Database connection (Neon serverless)
 - `server/storage.ts` — Data access layer (DatabaseStorage class)
-- `server/routes.ts` — API routes with session-based auth + public content API
-- `server/index.ts` — Express server setup with env var validation, serves static files from client/ dir (index:false), landing.html at `/`
-- `client/src/App.tsx` — React router with all admin pages
+- `server/routes.ts` — API routes with session-based auth + blocks/portfolio/CMS APIs
+- `server/index.ts` — Express server setup, serves static files from `dist/public/` in production
+- `client/src/App.tsx` — React router: `/` → LandingPage, `/admin/*` → admin pages
 - `client/src/pages/admin-*.tsx` — Admin panel pages
-- `client/src/pages/admin-site-editor.tsx` — Section content editor (hero, clients, stats, capabilities, etc.)
+- `client/src/pages/admin-blocks.tsx` — Visual page builder for CMS blocks
+- `client/src/pages/admin-portfolio.tsx` — Portfolio CRUD
 - `scripts/create-admin.ts` — CLI script to create admin user with bcrypt-hashed password
 
 ## Admin Panel Features

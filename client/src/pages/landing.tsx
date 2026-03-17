@@ -1,104 +1,275 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { useToast } from "@/hooks/use-toast";
-import {
-  Trees, Phone, Mail, MapPin, Clock, Send,
-  ChevronRight, Star, Factory, Truck, Shield,
-  Users, ArrowRight, MessageCircle, CheckCircle2,
-  Package, Layers, Award, Hammer, Settings2, Image as ImageIcon
-} from "lucide-react";
-import { SiWhatsapp, SiTelegram } from "react-icons/si";
-import type { Product, Review, Partner, SiteSetting, News, Block, Portfolio } from "@shared/schema";
+import type { Product, Partner, Block, Portfolio } from "@shared/schema";
+import "../landing.css";
 
-// ─── Helpers ────────────────────────────────────────────────────────────────
 function parseData(raw: string): any {
   try { return JSON.parse(raw); } catch { return {}; }
 }
 
-const FEATURE_ICONS: Record<string, any> = {
-  factory: Factory, truck: Truck, shield: Shield,
-  users: Users, layers: Layers, award: Award, hammer: Hammer,
-  settings: Settings2, star: Star, package: Package,
-};
+// ─── Header ──────────────────────────────────────────────────────────────────
+function Header() {
+  const [scrolled, setScrolled] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
 
-// ─── Hero ────────────────────────────────────────────────────────────────────
-function HeroSection({ data }: { data: any }) {
-  const title = data.title || "Крупносерийное производство изделий из дерева";
-  const subtitle = data.subtitle || "Разделочные доски, подносы, кухонные принадлежности и декор из массива. Работаем с B2B-клиентами по всей России.";
-  const cta = data.cta || "Оставить заявку";
-  const ctaSecondary = data.ctaSecondary || "Каталог продукции";
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 10);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+    if (href.startsWith("#")) {
+      e.preventDefault();
+      setMenuOpen(false);
+      if (href === "#") { window.scrollTo({ top: 0, behavior: "smooth" }); return; }
+      const el = document.querySelector(href);
+      if (el) el.scrollIntoView({ behavior: "smooth" });
+    }
+  };
 
   return (
-    <section className="relative min-h-[90vh] flex items-center overflow-hidden">
-      <div className="absolute inset-0 bg-gradient-to-br from-amber-950 via-amber-900 to-stone-900" />
-      <div className="absolute inset-0 opacity-20" style={{
-        backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23D4A574' fill-opacity='0.15'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
-      }} />
-      <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
-        <div className="max-w-3xl">
-          <Badge variant="outline" className="border-amber-400/30 text-amber-200 mb-6 text-sm px-4 py-1.5">
-            <Factory className="h-3.5 w-3.5 mr-1.5" />
-            Собственное производство в Московской области
-          </Badge>
-          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white leading-tight mb-6" data-testid="text-hero-title">
-            {title.includes("\n") ? title.split("\n").map((line: string, i: number) => (
-              <span key={i} className={i > 0 ? "block text-amber-300 mt-2" : ""}>{line}</span>
-            )) : (
-              <>
-                {title.split(" ").slice(0, 3).join(" ")}
-                <span className="block text-amber-300 mt-2">{title.split(" ").slice(3).join(" ") || "изделий из дерева"}</span>
-              </>
-            )}
-          </h1>
-          <p className="text-lg sm:text-xl text-amber-100/80 leading-relaxed mb-10 max-w-2xl">{subtitle}</p>
-          <div className="flex flex-col sm:flex-row gap-4">
-            <a href="#contact">
-              <Button size="lg" className="text-base px-8" data-testid="button-hero-cta">
-                {cta}<ArrowRight className="ml-2 h-5 w-5" />
-              </Button>
-            </a>
-            <a href="#products">
-              <Button size="lg" variant="outline" className="text-base px-8 border-amber-400/30 text-amber-100 bg-white/5 backdrop-blur-sm" data-testid="button-hero-catalog">
+    <header className={scrolled ? "scrolled" : ""} id="siteHeader" style={{ position: "sticky" }}>
+      <div className="container nav-wrapper">
+        <a href="#" className="logo" onClick={(e) => handleNavClick(e, "#")} data-testid="link-logo">
+          <img src="/logo.png" alt="WOODINY" style={{ height: 56, width: "auto" }} />
+        </a>
+        <button
+          className={`menu-toggle${menuOpen ? " active" : ""}`}
+          onClick={() => setMenuOpen(!menuOpen)}
+          aria-label="Открыть меню"
+          data-testid="button-menu-toggle"
+        >
+          <span></span>
+        </button>
+        <nav className={menuOpen ? "active" : ""} id="mainNav">
+          <ul>
+            <li><a href="#about" onClick={(e) => handleNavClick(e, "#about")} data-testid="link-about">О компании</a></li>
+            <li><a href="#capabilities" onClick={(e) => handleNavClick(e, "#capabilities")} data-testid="link-capabilities">Производство</a></li>
+            <li><a href="#products" onClick={(e) => handleNavClick(e, "#products")} data-testid="link-products">Продукция</a></li>
+            <li><a href="#process" onClick={(e) => handleNavClick(e, "#process")} data-testid="link-process">Как работаем</a></li>
+            <li><a href="#contacts" onClick={(e) => handleNavClick(e, "#contacts")} className="nav-cta" data-testid="link-contacts-cta">Оставить заявку</a></li>
+          </ul>
+        </nav>
+      </div>
+    </header>
+  );
+}
+
+// ─── Hero ─────────────────────────────────────────────────────────────────────
+function HeroSection({ data }: { data: any }) {
+  const videoRefs = useRef<HTMLVideoElement[]>([]);
+  const currentRef = useRef(0);
+  const fadingOutRef = useRef(false);
+
+  useEffect(() => {
+    const vids = videoRefs.current;
+    if (!vids.length || window.innerWidth <= 768) return;
+
+    function playVideo(index: number) {
+      const vid = vids[index];
+      if (!vid) return;
+      vid.currentTime = 0;
+      vid.play().catch(() => {});
+      fadingOutRef.current = false;
+      setTimeout(() => { vid.style.opacity = "0.4"; }, 200);
+    }
+
+    vids.forEach((vid, i) => {
+      vid.addEventListener("timeupdate", () => {
+        if (!vid.duration) return;
+        const timeLeft = vid.duration - vid.currentTime;
+        if (timeLeft <= 0.8 && !fadingOutRef.current && i === currentRef.current) {
+          fadingOutRef.current = true;
+          vid.style.opacity = "0";
+        }
+      });
+      vid.addEventListener("ended", () => {
+        if (i !== currentRef.current) return;
+        setTimeout(() => {
+          currentRef.current = (currentRef.current + 1) % vids.length;
+          playVideo(currentRef.current);
+        }, 100);
+      });
+    });
+
+    vids[0]?.addEventListener("canplay", () => {
+      if (vids[0]) vids[0].style.opacity = "0.4";
+    }, { once: true });
+    vids[0]?.play().catch(() => {});
+  }, []);
+
+  const handleAnchor = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+    e.preventDefault();
+    const el = document.querySelector(href);
+    if (el) el.scrollIntoView({ behavior: "smooth" });
+  };
+
+  const title = data?.title || "Деревянные изделия\nдля вашего бизнеса —\nваши идеи, наше воплощение";
+  const subtitle = data?.subtitle || "Собственное производство в Московской области. Контроль качества на каждом этапе. Работаем с любой древесиной лиственной породы.";
+  const text = data?.text || "Крупносерийное производство изделий из дерева";
+  const badge = data?.badge || "Собственное производство";
+  const cta = data?.cta || "Рассчитать заказ";
+  const ctaSecondary = data?.ctaSecondary || "О производстве";
+
+  const titleLines = title.split("\n");
+
+  return (
+    <section className="hero">
+      {["/hero-video-1.mp4", "/hero-video-2.mp4", "/hero-video-3.mp4", "/hero-video-4.mp4"].map((src, i) => (
+        <video
+          key={i}
+          className="hero-vid"
+          data-index={i}
+          muted
+          playsInline
+          poster={i === 0 ? "/hero-poster.png" : undefined}
+          ref={(el) => { if (el) videoRefs.current[i] = el; }}
+          style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", objectFit: "cover", zIndex: 1, pointerEvents: "none", opacity: 0, transition: "opacity 0.8s ease" }}
+        >
+          <source src={src} type="video/mp4" />
+        </video>
+      ))}
+      <div className="hero-decoration"></div>
+      <div className="hero-decoration-2"></div>
+      <div className="hero-decoration-3"></div>
+      <div className="container">
+        <div className="hero-grid">
+          <div className="hero-content">
+            <div className="hero-badge" data-testid="hero-badge">
+              <span className="hero-badge-dot"></span>
+              {badge}
+            </div>
+            <h1 data-testid="text-hero-title">
+              {titleLines.map((line, i) =>
+                i === titleLines.length - 1 && titleLines.length > 1
+                  ? <em key={i}>{line}</em>
+                  : <span key={i}>{line}{i < titleLines.length - 1 ? <br /> : null}</span>
+              )}
+            </h1>
+            <p className="hero-subtitle">{subtitle}</p>
+            <p className="hero-text">{text}</p>
+            <div className="hero-actions">
+              <a href="#contacts" className="btn-primary" onClick={(e) => handleAnchor(e, "#contacts")} data-testid="button-hero-cta">
+                {cta}
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+              </a>
+              <a href="#capabilities" className="btn-ghost" onClick={(e) => handleAnchor(e, "#capabilities")} data-testid="button-hero-secondary">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
                 {ctaSecondary}
-              </Button>
-            </a>
+              </a>
+            </div>
+          </div>
+          <div className="hero-image" data-testid="img-hero-production">
+            <img src="/hero-production.png" alt="Ассортимент деревянных изделий — разделочные доски, менажницы, скалки. Производство ВУДИНИ." loading="eager" />
+            <div className="hero-image-badge">Собственный цех</div>
           </div>
         </div>
       </div>
-      <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-background to-transparent" />
+      <div className="hero-line"></div>
     </section>
   );
 }
 
-// ─── Clients / Partners ───────────────────────────────────────────────────────
+// ─── Section Divider ──────────────────────────────────────────────────────────
+function SectionDivider({ style }: { style?: React.CSSProperties }) {
+  return (
+    <div className="section-divider" style={style}>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M12 2v10"/><path d="M18.4 6.6a9 9 0 1 1-12.77.04"/></svg>
+    </div>
+  );
+}
+
+// ─── Clients ──────────────────────────────────────────────────────────────────
 function ClientsSection({ data }: { data: any }) {
-  const { data: partners } = useQuery<Partner[]>({ queryKey: ["/api/partners"] });
-  const active = partners?.filter(p => p.isActive) || [];
-  if (!active.length) return null;
-  const title = data.title || "Нам доверяют";
+  const label = data?.label || "Наши клиенты";
+  const title = data?.title || "Кому мы подходим";
+  const desc = data?.desc || "Работаем с бизнесом, которому нужны стабильные поставки качественных деревянных изделий";
 
   return (
-    <section className="py-16 sm:py-20 bg-card/50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-12">
-          <h2 className="text-2xl sm:text-3xl font-bold mb-3" data-testid="text-partners-section">{title}</h2>
-          <p className="text-muted-foreground">Наши партнёры и клиенты</p>
+    <section id="about">
+      <div className="container">
+        <div className="section-header fade-in">
+          <span className="section-label">{label}</span>
+          <h2 className="section-title" data-testid="text-partners-section">{title}</h2>
+          <p className="section-desc">{desc}</p>
         </div>
-        <div className="flex flex-wrap items-center justify-center gap-8 lg:gap-12">
-          {active.map((p) => (
-            <div key={p.id} className="flex items-center gap-3 text-muted-foreground" data-testid={`partner-logo-${p.id}`}>
+        <div className="clients-grid">
+          <div className="client-card fade-in fade-in-delay-1" data-testid="card-client-retail">
+            <div className="client-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="m2 7 4.41-4.41A2 2 0 0 1 7.83 2h8.34a2 2 0 0 1 1.42.59L22 7"/><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><path d="M15 22v-4a2 2 0 0 0-2-2h-2a2 2 0 0 0-2 2v4"/><rect width="20" height="5" x="2" y="7" rx="1"/></svg>
+            </div>
+            <div>
+              <h3>Ритейл и сети</h3>
+              <p>Регулярные поставки для крупных торговых точек и розничных сетей по всей России</p>
+            </div>
+          </div>
+          <div className="client-card fade-in fade-in-delay-2" data-testid="card-client-marketplace">
+            <div className="client-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><rect width="20" height="14" x="2" y="5" rx="2"/><path d="M2 10h20"/></svg>
+            </div>
+            <div>
+              <h3>Маркетплейсы</h3>
+              <p>Изготовление ходовых позиций под ваш бренд для Ozon, Wildberries, Яндекс.Маркет</p>
+            </div>
+          </div>
+          <div className="client-card fade-in fade-in-delay-3" data-testid="card-client-production">
+            <div className="client-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M2 20a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8l-7 5V8l-7 5V4a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"/></svg>
+            </div>
+            <div>
+              <h3>Производственные компании</h3>
+              <p>Деревянные элементы и комплектующие для интеграции в вашу продукцию</p>
+            </div>
+          </div>
+          <div className="client-card fade-in fade-in-delay-4" data-testid="card-client-corporate">
+            <div className="client-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            </div>
+            <div>
+              <h3>Корпоративные заказы</h3>
+              <p>Бизнес-подарки, сувенирная продукция и брендированные товары оптом</p>
+            </div>
+          </div>
+          <div className="client-card fade-in fade-in-delay-5" data-testid="card-client-horeca">
+            <div className="client-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M17 11h1a3 3 0 0 1 0 6h-1"/><path d="M9 12a4 4 0 1 1 8 0c0 2.5-2 2.5-2 5h-4c0-2.5-2-2.5-2-5Z"/><path d="M9 17h6"/><path d="M10 22h4"/></svg>
+            </div>
+            <div>
+              <h3>HoReCa</h3>
+              <p>Рестораны, отели, бары — посуда и аксессуары из дерева для сервировки и интерьера</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// ─── Partners ─────────────────────────────────────────────────────────────────
+function PartnersSection() {
+  const { data: partners } = useQuery<Partner[]>({ queryKey: ["/api/partners"] });
+  const active = partners?.filter(p => p.isActive).sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0)) || [];
+  if (!active.length) return null;
+
+  const doubled = [...active, ...active];
+
+  return (
+    <section className="partners-section" data-testid="section-partners">
+      <div className="container">
+        <div className="partners-label fade-in">
+          <span>Нам доверяют</span>
+        </div>
+      </div>
+      <div className="partners-overflow">
+        <div className="partners-track">
+          {doubled.map((p, i) => (
+            <div key={`${p.id}-${i}`} className="partner-logo" data-testid={`partner-${p.name.toLowerCase().replace(/[^a-zа-я0-9]/gi, "-")}`}>
               {p.logoUrl ? (
-                <img src={p.logoUrl} alt={p.name} className="h-10 w-auto object-contain opacity-70" />
+                <img src={p.logoUrl} alt={p.name} style={{ maxHeight: 36, maxWidth: 120, objectFit: "contain" }} />
               ) : (
-                <div className="flex items-center gap-2 px-4 py-2 rounded-md bg-muted/50">
-                  <Users className="h-4 w-4" /><span className="font-medium text-sm">{p.name}</span>
-                </div>
+                <span className="partner-name" style={p.brandColor ? { color: p.brandColor } : undefined}>{p.name}</span>
               )}
             </div>
           ))}
@@ -108,87 +279,259 @@ function ClientsSection({ data }: { data: any }) {
   );
 }
 
-// ─── Features / Advantages ────────────────────────────────────────────────────
-function FeaturesSection({ data }: { data: any }) {
-  const title = data.title || "Почему выбирают нас";
-  const defaultItems = [
-    { icon: "factory", title: "Своё производство", description: "Полный цикл от заготовки до упаковки на собственной фабрике в МО" },
-    { icon: "layers", title: "Любые объёмы", description: "От 100 до 100 000 единиц. Гибкие сроки и масштабируемость" },
-    { icon: "award", title: "Качество древесины", description: "Работаем с дубом, буком, ясенем, берёзой. Сертифицированное сырьё" },
-    { icon: "truck", title: "Доставка по РФ", description: "Отправка транспортными компаниями в любой регион России" },
-    { icon: "shield", title: "Гарантия качества", description: "Контроль на каждом этапе. Замена при обнаружении брака" },
-    { icon: "hammer", title: "Брендирование", description: "Нанесение логотипа гравировкой или печатью на готовые изделия" },
+// ─── Stats ────────────────────────────────────────────────────────────────────
+function StatsSection() {
+  const [counts, setCounts] = useState([0, 0, 0]);
+  const sectionRef = useRef<HTMLDivElement>(null);
+  const animatedRef = useRef(false);
+
+  const stats = [
+    { target: 100000, suffix: "+", label: "изделий в месяц", icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 7h-9"/><path d="M14 17H5"/><circle cx="17" cy="17" r="3"/><circle cx="7" cy="7" r="3"/></svg> },
+    { target: 1500, suffix: " м²", label: "производственных площадей", icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 7V5a2 2 0 0 1 2-2h2"/><path d="M17 3h2a2 2 0 0 1 2 2v2"/><path d="M21 17v2a2 2 0 0 1-2 2h-2"/><path d="M7 21H5a2 2 0 0 1-2-2v-2"/><rect width="10" height="10" x="7" y="7" rx="1"/></svg> },
+    { target: 50, suffix: "+", label: "постоянных клиентов", icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg> },
   ];
-  const items: any[] = data.items?.length ? data.items : defaultItems;
+
+  useEffect(() => {
+    const el = sectionRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting && !animatedRef.current) {
+          animatedRef.current = true;
+          stats.forEach((stat, idx) => {
+            const duration = 2200;
+            const start = performance.now();
+            const animate = (now: number) => {
+              const elapsed = now - start;
+              const progress = Math.min(elapsed / duration, 1);
+              const eased = 1 - Math.pow(1 - progress, 4);
+              setCounts(prev => {
+                const next = [...prev];
+                next[idx] = Math.floor(eased * stat.target);
+                return next;
+              });
+              if (progress < 1) requestAnimationFrame(animate);
+            };
+            requestAnimationFrame(animate);
+          });
+        }
+      });
+    }, { threshold: 0.5 });
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
+  const formatNumber = (n: number) => n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, "\u00A0");
 
   return (
-    <section className="py-20 sm:py-28 bg-background">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-16">
-          <h2 className="text-3xl sm:text-4xl font-bold mb-4" data-testid="text-advantages-title">{title}</h2>
-          <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-            Более 10 лет производим качественные изделия из натурального дерева для бизнеса
-          </p>
+    <div className="stats-section" ref={sectionRef}>
+      <div className="container">
+        <div className="stats-grid">
+          {stats.map((stat, i) => (
+            <div key={i} className="stat-item fade-in" style={{ transitionDelay: `${i * 0.1}s` }}>
+              <div className="stat-icon">{stat.icon}</div>
+              <div className="stat-number" data-testid={`text-stat-${i}`}>{formatNumber(counts[i])}{stat.suffix}</div>
+              <div className="stat-label">{stat.label}</div>
+            </div>
+          ))}
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {items.map((item: any, i: number) => {
-            const Icon = FEATURE_ICONS[item.icon] || Star;
-            return (
-              <Card key={i} className="group hover-elevate transition-all">
-                <CardContent className="p-6">
-                  <div className="w-12 h-12 rounded-md bg-primary/10 flex items-center justify-center mb-4">
-                    <Icon className="h-6 w-6 text-primary" />
+      </div>
+    </div>
+  );
+}
+
+// ─── Capabilities ─────────────────────────────────────────────────────────────
+function CapabilitiesSection({ data }: { data: any }) {
+  const label = data?.label || "Наше производство";
+  const title = data?.title || "Производственные возможности";
+  const desc = data?.desc || "Современное оборудование и многолетний опыт для реализации проектов любой сложности";
+
+  const capabilities = [
+    { title: "Работаем с крупными заказами", desc: "От 500 единиц SKU" },
+    { title: "Станки ЧПУ", desc: "Точность обработки до 0.1 мм" },
+    { title: "Лазерная резка", desc: "Сложные контуры и гравировка" },
+    { title: "Токарные работы", desc: "Скалки, толкушки, ручки" },
+    { title: "Гравировка по металлу", desc: "Нанесение логотипов и маркировка" },
+  ];
+
+  return (
+    <section id="capabilities" className="capabilities-section">
+      <div className="container">
+        <div className="section-header fade-in">
+          <span className="section-label">{label}</span>
+          <h2 className="section-title" data-testid="text-advantages-title">{title}</h2>
+          <p className="section-desc">{desc}</p>
+        </div>
+        <div className="capabilities-wrapper">
+          <div className="capabilities-visual fade-in">
+            <div className="capabilities-visual-bg">
+              <div className="capabilities-visual-badge">Московская область</div>
+              <img src="/production-1.png" alt="Крупное деревообрабатывающее производство ВУДИНИ" style={{ width: "100%", height: "100%", objectFit: "cover", position: "absolute", top: 0, left: 0, opacity: 0.35 }} />
+              <div className="capabilities-visual-text">
+                <h3>Собственный цех</h3>
+                <p>Полный цикл производства на 1500 м²</p>
+              </div>
+            </div>
+          </div>
+          <div className="fade-in fade-in-delay-2">
+            <ul className="capability-list">
+              {capabilities.map((cap, i) => (
+                <li key={i} className="capability-item">
+                  <div className="capability-check">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
                   </div>
-                  <h3 className="text-lg font-semibold mb-2">{item.title}</h3>
-                  <p className="text-sm text-muted-foreground leading-relaxed">{item.description}</p>
-                </CardContent>
-              </Card>
-            );
-          })}
+                  <div className="capability-content">
+                    <h4>{cap.title}</h4>
+                    <p>{cap.desc}</p>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </div>
         </div>
       </div>
     </section>
   );
 }
 
-// ─── Products ────────────────────────────────────────────────────────────────
+// ─── Production Gallery ───────────────────────────────────────────────────────
+function ProductionSection() {
+  return (
+    <section id="production">
+      <div className="container">
+        <div className="section-header fade-in">
+          <span className="section-label">Наше производство</span>
+          <h2 className="section-title">Собственный цех в Подмосковье</h2>
+          <p className="section-desc">Современное оборудование, отлаженные процессы и строгий контроль качества на каждом этапе</p>
+        </div>
+        <div className="production-gallery">
+          {[
+            { src: "/production-1.png", alt: "Деревообрабатывающий цех с ЧПУ-станками", h3: "Станки с ЧПУ", p: "Точность обработки до 0.1 мм", testid: "card-production-cnc" },
+            { src: "/production-2.png", alt: "Контроль качества готовой продукции", h3: "Контроль качества", p: "Проверка каждой единицы продукции", testid: "card-production-quality" },
+            { src: "/production-3.png", alt: "Склад и отгрузка готовой продукции", h3: "Склад и логистика", p: "Отгрузка по всей России", testid: "card-production-shipping" },
+          ].map((card, i) => (
+            <div key={i} className={`production-card fade-in fade-in-delay-${i + 1}`} data-testid={card.testid}>
+              <img src={card.src} alt={card.alt} loading="lazy" />
+              <div className="production-card-overlay">
+                <h3>{card.h3}</h3>
+                <p>{card.p}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// ─── Products ─────────────────────────────────────────────────────────────────
 function ProductsSection({ data }: { data: any }) {
   const { data: products } = useQuery<Product[]>({ queryKey: ["/api/products"] });
   const active = products?.filter(p => p.isActive) || [];
-  if (!active.length) return null;
-  const title = data.title || "Наша продукция";
-  const description = data.description || "Широкий ассортимент изделий из массива дерева для кухни, сервировки и декора";
+
+  const label = data?.label || "Каталог";
+  const title = data?.title || "Продукция";
+  const desc = data?.desc || "Производим широкий ассортимент изделий из натурального дерева";
+
+  const defaultProducts = [
+    { name: "Разделочные доски", sub: "Бук, дуб, берёза", testid: "card-product-boards", svg: <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><rect x="10" y="8" width="36" height="48" rx="4"/><path d="M10 18h36"/><path d="M28 18v38"/><circle cx="22" cy="12" r="2"/></svg> },
+    { name: "Менажницы", sub: "Секционные блюда", testid: "card-product-menazhnitsy", svg: <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="32" cy="32" r="24"/><path d="M32 8v48"/><path d="M8 32h48"/><path d="M14 14l36 36"/></svg> },
+    { name: "Скалки и толкушки", sub: "Классические и фигурные", testid: "card-product-skalki", svg: <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><rect x="8" y="26" width="48" height="12" rx="6"/><path d="M8 32H4"/><path d="M56 32h4"/><circle cx="4" cy="32" r="3"/><circle cx="60" cy="32" r="3"/></svg> },
+    { name: "Изделия для сервировки", sub: "Сырницы, маслёнки, блюда", testid: "card-product-servirovka", svg: <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><ellipse cx="32" cy="36" rx="24" ry="8"/><path d="M8 36c0 8 10.7 14 24 14s24-6 24-14"/><path d="M32 10v12"/><circle cx="32" cy="8" r="3"/></svg> },
+    { name: "Изделия по ТЗ", sub: "Под ваш проект", testid: "card-product-custom", svg: <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M40 20a1 1 0 0 0 0 1.4l2.6 2.6a1 1 0 0 0 1.4 0l6-6a10 10 0 0 1-13 13L22 46a3.5 3.5 0 0 1-5-5l15-15a10 10 0 0 1 13-13l-5 5z"/></svg> },
+  ];
+
+  const displayProducts = active.length ? active.slice(0, 5) : null;
 
   return (
-    <section id="products" className="py-20 sm:py-28 bg-card/50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-16">
-          <h2 className="text-3xl sm:text-4xl font-bold mb-4" data-testid="text-products-section">{title}</h2>
-          <p className="text-muted-foreground text-lg max-w-2xl mx-auto">{description}</p>
+    <section id="products">
+      <div className="container">
+        <div className="section-header fade-in">
+          <span className="section-label">{label}</span>
+          <h2 className="section-title" data-testid="text-products-section">{title}</h2>
+          <p className="section-desc">{desc}</p>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {active.map((product) => (
-            <Card key={product.id} className="group hover-elevate transition-all" data-testid={`card-landing-product-${product.id}`}>
-              <CardContent className="p-0">
-                {product.imageUrl ? (
-                  <div className="aspect-[4/3] overflow-hidden rounded-t-md">
-                    <img src={product.imageUrl} alt={product.name} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
-                  </div>
-                ) : (
-                  <div className="aspect-[4/3] bg-muted flex items-center justify-center rounded-t-md">
-                    <Package className="h-12 w-12 text-muted-foreground/30" />
-                  </div>
-                )}
-                <div className="p-5">
-                  <div className="flex items-start justify-between gap-2 mb-2">
-                    <h3 className="font-semibold text-lg">{product.name}</h3>
-                    {product.price && <Badge variant="secondary" className="shrink-0">{product.price}</Badge>}
-                  </div>
-                  {product.category && <span className="text-xs text-muted-foreground">{product.category}</span>}
-                  {product.description && <p className="text-sm text-muted-foreground mt-2 leading-relaxed line-clamp-2">{product.description}</p>}
+        <div className="products-grid">
+          {displayProducts
+            ? displayProducts.map((product, i) => (
+              <div key={product.id} className={`product-card fade-in fade-in-delay-${i + 1}`} data-testid={`card-landing-product-${product.id}`}>
+                <div className="product-thumb">
+                  {product.imageUrl
+                    ? <img src={product.imageUrl} alt={product.name} />
+                    : <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><rect x="10" y="8" width="36" height="48" rx="4"/></svg>
+                  }
                 </div>
-              </CardContent>
-            </Card>
+                <div className="product-info">
+                  <h3>{product.name}</h3>
+                  <p>{product.category || ""}</p>
+                </div>
+              </div>
+            ))
+            : defaultProducts.map((p, i) => (
+              <div key={i} className={`product-card fade-in fade-in-delay-${i + 1}`} data-testid={p.testid}>
+                <div className="product-thumb">{p.svg}</div>
+                <div className="product-info">
+                  <h3>{p.name}</h3>
+                  <p>{p.sub}</p>
+                </div>
+              </div>
+            ))
+          }
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// ─── Process ──────────────────────────────────────────────────────────────────
+function ProcessSection({ data }: { data: any }) {
+  const trackRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const el = trackRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          setTimeout(() => entry.target.classList.add("animated"), 400);
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.3 });
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
+  const label = data?.label || "Процесс";
+  const title = data?.title || "Как мы работаем";
+  const desc = data?.desc || "Отлаженный процесс от первого запроса до отгрузки готовой продукции";
+
+  const steps = [
+    { title: "Получаем ТЗ", desc: "Изучаем ваши требования, объёмы и сроки" },
+    { title: "Рассчитываем стоимость", desc: "Коммерческое предложение за 1 рабочий день" },
+    { title: "Согласуем образец", desc: "Изготавливаем и утверждаем образец" },
+    { title: "Запускаем в производство", desc: "Производство с контролем на каждом этапе" },
+    { title: "Проверяем качество", desc: "100% проверка перед упаковкой" },
+    { title: "Отгружаем", desc: "Доставка по всей России, ТК или самовывоз" },
+  ];
+
+  return (
+    <section id="process" className="process-section">
+      <div className="container">
+        <div className="section-header fade-in">
+          <span className="section-label">{label}</span>
+          <h2 className="section-title">{title}</h2>
+          <p className="section-desc">{desc}</p>
+        </div>
+        <div className="process-track fade-in" id="processTrack" ref={trackRef}>
+          {steps.map((step, i) => (
+            <div key={i} className="process-step">
+              <div className="step-number">{i + 1}</div>
+              <div>
+                <h3>{step.title}</h3>
+                <p>{step.desc}</p>
+              </div>
+            </div>
           ))}
         </div>
       </div>
@@ -200,147 +543,49 @@ function ProductsSection({ data }: { data: any }) {
 function PortfolioSection({ data }: { data: any }) {
   const { data: portfolioItems } = useQuery<Portfolio[]>({ queryKey: ["/api/portfolio"] });
   const active = portfolioItems?.filter(p => p.isActive) || [];
-  if (!active.length) return null;
-  const title = data.title || "Портфолио";
-  const description = data.description || "Примеры наших работ";
 
-  return (
-    <section className="py-20 sm:py-28 bg-background">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-16">
-          <h2 className="text-3xl sm:text-4xl font-bold mb-4">{title}</h2>
-          <p className="text-muted-foreground text-lg max-w-2xl mx-auto">{description}</p>
-        </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {active.map((item) => (
-            <Card key={item.id} className="group hover-elevate transition-all overflow-hidden">
-              <div className="aspect-[4/3] overflow-hidden bg-muted">
-                {item.imageUrl ? (
-                  <img src={item.imageUrl} alt={item.title} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center">
-                    <ImageIcon className="h-12 w-12 text-muted-foreground/30" />
-                  </div>
-                )}
-              </div>
-              <CardContent className="p-5">
-                <h3 className="font-semibold text-lg">{item.title}</h3>
-                {item.description && <p className="text-sm text-muted-foreground mt-2 line-clamp-2">{item.description}</p>}
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
+  const label = data?.label || "Наши работы";
+  const title = data?.title || "Портфолио";
+  const desc = data?.desc || "Примеры изделий, выполненных для наших клиентов";
 
-// ─── Process ─────────────────────────────────────────────────────────────────
-function ProcessSection({ data }: { data: any }) {
-  const title = data.title || "Как мы работаем";
-  const defaultSteps = [
-    { title: "Заявка", description: "Оставьте заявку или позвоните нам" },
-    { title: "Расчёт", description: "Рассчитаем стоимость и сроки" },
-    { title: "Производство", description: "Изготовим в срок с контролем качества" },
-    { title: "Доставка", description: "Доставим в любую точку России" },
+  const defaultItems = [
+    "Разделочные доски", "Менажницы", "Корпоративные",
+    "Скалки и толкушки", "Сервировка", "Сувениры",
+    "По ТЗ клиента", "Брендирование",
   ];
-  const steps: any[] = data.steps?.length ? data.steps : defaultSteps;
+
+  const imageSvg = (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>
+  );
 
   return (
-    <section className="py-20 sm:py-28 bg-card/50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-16">
-          <h2 className="text-3xl sm:text-4xl font-bold mb-4">{title}</h2>
+    <section className="portfolio-section">
+      <div className="container">
+        <div className="section-header fade-in">
+          <span className="section-label">{label}</span>
+          <h2 className="section-title">{title}</h2>
+          <p className="section-desc">{desc}</p>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {steps.map((step: any, i: number) => (
-            <div key={i} className="relative">
-              <div className="flex flex-col items-center text-center">
-                <div className="w-14 h-14 rounded-full bg-primary flex items-center justify-center mb-4 text-primary-foreground font-bold text-xl">
-                  {i + 1}
+        <div className="portfolio-grid fade-in">
+          {active.length
+            ? active.slice(0, 8).map((item, i) => (
+              <div key={item.id} className="portfolio-item" data-testid={`portfolio-item-${i + 1}`}>
+                <div className={`portfolio-item-inner${item.imageUrl ? " has-image" : ""}`} style={{ position: "relative" }}>
+                  {item.imageUrl
+                    ? <img src={item.imageUrl} alt={item.title} />
+                    : imageSvg
+                  }
                 </div>
-                <h3 className="font-semibold text-lg mb-2">{step.title}</h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">{step.description}</p>
+                <div className="portfolio-overlay"><span>{item.title}</span></div>
               </div>
-              {i < steps.length - 1 && (
-                <div className="hidden lg:block absolute top-7 left-[calc(50%+2rem)] w-[calc(100%-4rem)] h-0.5 bg-border" />
-              )}
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-// ─── Reviews ─────────────────────────────────────────────────────────────────
-function ReviewsSection() {
-  const { data: reviews } = useQuery<Review[]>({ queryKey: ["/api/reviews"] });
-  const active = reviews?.filter(r => r.isActive) || [];
-  if (!active.length) return null;
-
-  return (
-    <section className="py-20 sm:py-28 bg-background">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-16">
-          <h2 className="text-3xl sm:text-4xl font-bold mb-4" data-testid="text-reviews-section">Отзывы клиентов</h2>
-          <p className="text-muted-foreground text-lg max-w-2xl mx-auto">Нам доверяют компании по всей России</p>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {active.map((review) => (
-            <Card key={review.id} className="hover-elevate transition-all" data-testid={`card-landing-review-${review.id}`}>
-              <CardContent className="p-6">
-                <div className="flex gap-0.5 mb-4">
-                  {Array.from({ length: review.rating || 5 }).map((_, i) => (
-                    <Star key={i} className="h-4 w-4 fill-yellow-500 text-yellow-500" />
-                  ))}
-                </div>
-                <p className="text-sm leading-relaxed mb-5">{review.text}</p>
-                <div className="flex items-center gap-3 pt-4 border-t">
-                  <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-                    <span className="text-sm font-bold text-primary">{review.authorName.charAt(0).toUpperCase()}</span>
-                  </div>
-                  <div>
-                    <p className="font-medium text-sm">{review.authorName}</p>
-                    {review.company && <p className="text-xs text-muted-foreground">{review.company}</p>}
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-// ─── News ─────────────────────────────────────────────────────────────────────
-function NewsSection() {
-  const { data: newsList } = useQuery<News[]>({ queryKey: ["/api/news"] });
-  const published = newsList?.filter(n => n.isPublished) || [];
-  if (!published.length) return null;
-  const catLabels: Record<string, string> = { news: "Новость", promo: "Акция", offer: "Спецпредложение" };
-
-  return (
-    <section className="py-20 sm:py-28 bg-background">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-16">
-          <h2 className="text-3xl sm:text-4xl font-bold mb-4">Новости и акции</h2>
-          <p className="text-muted-foreground text-lg">Последние обновления от ВУДИНИ</p>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {published.slice(0, 3).map((item) => (
-            <Card key={item.id} className="hover-elevate transition-all">
-              <CardContent className="p-6">
-                <div className="flex items-center gap-2 mb-3">
-                  <Badge variant="outline">{catLabels[item.category || "news"] || item.category}</Badge>
-                  {item.createdAt && <span className="text-xs text-muted-foreground">{new Date(item.createdAt).toLocaleDateString("ru-RU")}</span>}
-                </div>
-                <h3 className="font-semibold text-lg mb-2">{item.title}</h3>
-                <p className="text-sm text-muted-foreground leading-relaxed line-clamp-3">{item.content}</p>
-              </CardContent>
-            </Card>
-          ))}
+            ))
+            : defaultItems.map((label, i) => (
+              <div key={i} className="portfolio-item" data-testid={`portfolio-item-${i + 1}`}>
+                <div className="portfolio-item-inner">{imageSvg}</div>
+                <div className="portfolio-overlay"><span>{label}</span></div>
+              </div>
+            ))
+          }
         </div>
       </div>
     </section>
@@ -349,129 +594,108 @@ function NewsSection() {
 
 // ─── Contacts ─────────────────────────────────────────────────────────────────
 function ContactSection({ data }: { data: any }) {
-  const { toast } = useToast();
-  const { data: settings } = useQuery<SiteSetting[]>({
-    queryKey: ["/api/settings/public"],
-    queryFn: async () => {
-      const res = await fetch("/api/settings/public");
-      if (!res.ok) return [];
-      return res.json();
-    },
-  });
+  const [form, setForm] = useState({ fio: "", phone: "", email: "", message: "" });
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [success, setSuccess] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
 
-  const [form, setForm] = useState({ name: "", phone: "", email: "", company: "", message: "" });
-  const settingsMap: Record<string, string> = {};
-  settings?.forEach(s => { settingsMap[s.key] = s.value; });
+  const label = data?.label || "Оставить заявку";
+  const title = data?.title || "Рассчитаем ваш заказ\nв течение 1 рабочего дня";
 
-  const phone = data.phone || settingsMap.phone;
-  const email = data.email || settingsMap.email;
-  const address = data.address || settingsMap.address;
-  const title = data.title || "Свяжитесь с нами";
+  const handlePhone = (e: React.ChangeEvent<HTMLInputElement>) => {
+    let val = e.target.value.replace(/\D/g, "");
+    if (!val.length) { setForm(f => ({ ...f, phone: "" })); return; }
+    if (val[0] === "8") val = "7" + val.slice(1);
+    if (val[0] !== "7") val = "7" + val;
+    let formatted = "+7";
+    if (val.length > 1) formatted += " (" + val.slice(1, 4);
+    if (val.length > 4) formatted += ") " + val.slice(4, 7);
+    if (val.length > 7) formatted += "-" + val.slice(7, 9);
+    if (val.length > 9) formatted += "-" + val.slice(9, 11);
+    setForm(f => ({ ...f, phone: formatted }));
+  };
 
-  const submitMutation = useMutation({
-    mutationFn: () => apiRequest("POST", "/api/inquiries", form),
-    onSuccess: () => {
-      toast({ title: "Заявка отправлена!", description: "Мы свяжемся с вами в ближайшее время" });
-      setForm({ name: "", phone: "", email: "", company: "", message: "" });
-    },
-    onError: () => toast({ title: "Ошибка", description: "Не удалось отправить заявку", variant: "destructive" }),
-  });
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const newErrors: Record<string, string> = {};
+    if (!form.fio.trim()) newErrors.fio = "Введите ФИО";
+    const phoneClean = form.phone.replace(/\D/g, "");
+    if (phoneClean.length < 11) newErrors.phone = "Введите корректный номер";
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) newErrors.email = "Введите корректный email";
+    setErrors(newErrors);
+    if (Object.keys(newErrors).length) return;
+
+    setSubmitting(true);
+    try {
+      await fetch("/api/inquiries", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: form.fio, phone: form.phone, email: form.email, message: form.message, status: "new" }),
+      });
+      setSuccess(true);
+      setForm({ fio: "", phone: "", email: "", message: "" });
+      setTimeout(() => setSuccess(false), 6000);
+    } catch {}
+    setSubmitting(false);
+  };
+
+  const titleLines = title.split("\n");
 
   return (
-    <section id="contact" className="py-20 sm:py-28 bg-card/50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-16">
-          <h2 className="text-3xl sm:text-4xl font-bold mb-4" data-testid="text-contact-section">{title}</h2>
-          <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-            Оставьте заявку и мы подготовим индивидуальное предложение для вашего бизнеса
-          </p>
+    <section id="contacts" className="form-section">
+      <div className="container">
+        <div className="section-header fade-in">
+          <span className="section-label">{label}</span>
+          <h2 className="section-title" data-testid="text-contact-section">
+            {titleLines.map((line, i) => <span key={i}>{line}{i < titleLines.length - 1 ? <br /> : null}</span>)}
+          </h2>
         </div>
-        <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
-          <div className="lg:col-span-3">
-            <Card>
-              <CardContent className="p-6 sm:p-8">
-                <form onSubmit={(e) => { e.preventDefault(); submitMutation.mutate(); }} className="space-y-5">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                      <label className="text-sm font-medium mb-1.5 block">Ваше имя *</label>
-                      <Input data-testid="input-contact-name" placeholder="Иван Иванов" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required />
-                    </div>
-                    <div>
-                      <label className="text-sm font-medium mb-1.5 block">Телефон</label>
-                      <Input data-testid="input-contact-phone" placeholder="+7 (XXX) XXX-XX-XX" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} />
-                    </div>
-                  </div>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                      <label className="text-sm font-medium mb-1.5 block">Email</label>
-                      <Input data-testid="input-contact-email" type="email" placeholder="email@company.ru" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
-                    </div>
-                    <div>
-                      <label className="text-sm font-medium mb-1.5 block">Компания</label>
-                      <Input data-testid="input-contact-company" placeholder="ООО «Компания»" value={form.company} onChange={(e) => setForm({ ...form, company: e.target.value })} />
-                    </div>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium mb-1.5 block">Сообщение</label>
-                    <Textarea data-testid="input-contact-message" placeholder="Опишите ваш запрос: какие изделия, объём, сроки..." rows={4} value={form.message} onChange={(e) => setForm({ ...form, message: e.target.value })} />
-                  </div>
-                  <Button data-testid="button-submit-inquiry" type="submit" size="lg" className="w-full sm:w-auto px-8" disabled={submitMutation.isPending}>
-                    <Send className="mr-2 h-4 w-4" />
-                    {submitMutation.isPending ? "Отправка..." : "Отправить заявку"}
-                  </Button>
-                </form>
-              </CardContent>
-            </Card>
+        <div className="form-wrapper">
+          <div className="form-info fade-in">
+            <h3>Расскажите о вашем проекте</h3>
+            <p>Заполните форму, и наш менеджер свяжется с вами для обсуждения деталей заказа. Расчёт стоимости бесплатный.</p>
+            <ul className="form-features">
+              {[
+                { icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>, text: "Бесплатный расчёт стоимости" },
+                { icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>, text: "Конфиденциальность гарантирована" },
+                { icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 8v4l3 3m6-3a9 9 0 1 1-18 0 9 9 0 0 1 18 0z"/></svg>, text: "Ответ в течение 1 рабочего дня" },
+              ].map((f, i) => (
+                <li key={i}>
+                  <div className="form-feature-icon">{f.icon}</div>
+                  {f.text}
+                </li>
+              ))}
+            </ul>
           </div>
-          <div className="lg:col-span-2 space-y-4">
-            {phone && (
-              <a href={`tel:${phone.replace(/\D/g, '')}`} className="block">
-                <Card className="hover-elevate transition-all">
-                  <CardContent className="p-5 flex items-center gap-4">
-                    <div className="w-11 h-11 rounded-md bg-primary/10 flex items-center justify-center shrink-0"><Phone className="h-5 w-5 text-primary" /></div>
-                    <div><p className="text-xs text-muted-foreground mb-0.5">Телефон</p><p className="font-semibold">{phone}</p></div>
-                  </CardContent>
-                </Card>
-              </a>
-            )}
-            {email && (
-              <a href={`mailto:${email}`} className="block">
-                <Card className="hover-elevate transition-all">
-                  <CardContent className="p-5 flex items-center gap-4">
-                    <div className="w-11 h-11 rounded-md bg-primary/10 flex items-center justify-center shrink-0"><Mail className="h-5 w-5 text-primary" /></div>
-                    <div><p className="text-xs text-muted-foreground mb-0.5">Email</p><p className="font-semibold">{email}</p></div>
-                  </CardContent>
-                </Card>
-              </a>
-            )}
-            {address && (
-              <Card>
-                <CardContent className="p-5 flex items-center gap-4">
-                  <div className="w-11 h-11 rounded-md bg-primary/10 flex items-center justify-center shrink-0"><MapPin className="h-5 w-5 text-primary" /></div>
-                  <div><p className="text-xs text-muted-foreground mb-0.5">Адрес</p><p className="font-medium text-sm">{address}</p></div>
-                </CardContent>
-              </Card>
-            )}
-            {settingsMap.work_hours && (
-              <Card>
-                <CardContent className="p-5 flex items-center gap-4">
-                  <div className="w-11 h-11 rounded-md bg-primary/10 flex items-center justify-center shrink-0"><Clock className="h-5 w-5 text-primary" /></div>
-                  <div><p className="text-xs text-muted-foreground mb-0.5">Часы работы</p><p className="font-medium text-sm">{settingsMap.work_hours}</p></div>
-                </CardContent>
-              </Card>
-            )}
-            <div className="flex gap-3 pt-2">
-              {(data.whatsapp || settingsMap.whatsapp) && (
-                <a href={data.whatsapp || settingsMap.whatsapp} target="_blank" rel="noopener noreferrer">
-                  <Button variant="outline" size="icon" data-testid="link-whatsapp"><SiWhatsapp className="h-4 w-4" /></Button>
-                </a>
-              )}
-              {settingsMap.telegram && (
-                <a href={settingsMap.telegram} target="_blank" rel="noopener noreferrer">
-                  <Button variant="outline" size="icon" data-testid="link-telegram"><SiTelegram className="h-4 w-4" /></Button>
-                </a>
-              )}
-            </div>
+          <div className="form-container fade-in fade-in-delay-2">
+            {success && <div className="form-success">✓ Заявка успешно отправлена! Мы свяжемся с вами в ближайшее время.</div>}
+            <form onSubmit={handleSubmit}>
+              <div className={`form-group${errors.fio ? " has-error" : ""}`}>
+                <label>ФИО <span className="required">*</span></label>
+                <input type="text" placeholder="Иван Иванов" value={form.fio} onChange={e => setForm(f => ({ ...f, fio: e.target.value }))} data-testid="input-contact-name" />
+                {errors.fio && <div className="error-text">{errors.fio}</div>}
+              </div>
+              <div className="form-row">
+                <div className={`form-group${errors.phone ? " has-error" : ""}`}>
+                  <label>Телефон <span className="required">*</span></label>
+                  <input type="tel" placeholder="+7 (___) ___-__-__" value={form.phone} onChange={handlePhone} onFocus={e => { if (!e.target.value) setForm(f => ({ ...f, phone: "+7 (" })); }} onBlur={e => { if (e.target.value === "+7 (" || e.target.value === "+7") setForm(f => ({ ...f, phone: "" })); }} data-testid="input-contact-phone" />
+                  {errors.phone && <div className="error-text">{errors.phone}</div>}
+                </div>
+                <div className={`form-group${errors.email ? " has-error" : ""}`}>
+                  <label>Email <span className="required">*</span></label>
+                  <input type="email" placeholder="email@company.ru" value={form.email} onChange={e => setForm(f => ({ ...f, email: e.target.value }))} data-testid="input-contact-email" />
+                  {errors.email && <div className="error-text">{errors.email}</div>}
+                </div>
+              </div>
+              <div className="form-group">
+                <label>Сообщение</label>
+                <textarea placeholder="Опишите ваш запрос: какие изделия, объём, сроки..." value={form.message} onChange={e => setForm(f => ({ ...f, message: e.target.value }))} data-testid="input-contact-message" />
+              </div>
+              <button type="submit" className="btn-submit" disabled={submitting} data-testid="button-submit-inquiry">
+                {submitting ? "Отправка..." : "Отправить заявку"}
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+              </button>
+            </form>
           </div>
         </div>
       </div>
@@ -479,135 +703,121 @@ function ContactSection({ data }: { data: any }) {
   );
 }
 
-// ─── Static sections ──────────────────────────────────────────────────────────
-function StatsBar() {
-  const stats = [
-    { value: "10+", label: "лет на рынке" },
-    { value: "500+", label: "B2B клиентов" },
-    { value: "2M+", label: "изделий в год" },
-    { value: "24ч", label: "ответ на заявку" },
-  ];
-  return (
-    <section className="py-12 bg-primary">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
-          {stats.map((s, i) => (
-            <div key={i} className="text-center">
-              <p className="text-3xl sm:text-4xl font-bold text-primary-foreground mb-1">{s.value}</p>
-              <p className="text-sm text-primary-foreground/70">{s.label}</p>
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function Header() {
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
-          <a href="/" className="flex items-center gap-2.5" data-testid="link-logo">
-            <img src="/logo.png" alt="ВУДИНИ" className="h-10 w-auto object-contain" onError={(e) => {
-              (e.target as HTMLImageElement).style.display = "none";
-            }} />
-          </a>
-          <nav className="hidden md:flex items-center gap-8">
-            <a href="#products" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors" data-testid="link-nav-products">Продукция</a>
-            <a href="#contact" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors" data-testid="link-nav-contact">Контакты</a>
-          </nav>
-          <div className="hidden md:flex items-center gap-3">
-            <a href="#contact">
-              <Button data-testid="button-header-cta">Оставить заявку<ChevronRight className="ml-1 h-4 w-4" /></Button>
-            </a>
-          </div>
-          <button className="md:hidden p-2" onClick={() => setMobileMenuOpen(!mobileMenuOpen)} data-testid="button-mobile-nav">
-            <div className="space-y-1.5">
-              <span className={`block w-6 h-0.5 bg-foreground transition-all ${mobileMenuOpen ? 'rotate-45 translate-y-2' : ''}`} />
-              <span className={`block w-6 h-0.5 bg-foreground transition-all ${mobileMenuOpen ? 'opacity-0' : ''}`} />
-              <span className={`block w-6 h-0.5 bg-foreground transition-all ${mobileMenuOpen ? '-rotate-45 -translate-y-2' : ''}`} />
-            </div>
-          </button>
-        </div>
-        {mobileMenuOpen && (
-          <div className="md:hidden border-t py-4 space-y-3">
-            <a href="#products" className="block py-2 text-sm font-medium text-muted-foreground" onClick={() => setMobileMenuOpen(false)}>Продукция</a>
-            <a href="#contact" className="block py-2 text-sm font-medium text-muted-foreground" onClick={() => setMobileMenuOpen(false)}>Контакты</a>
-            <a href="#contact"><Button className="w-full mt-2" onClick={() => setMobileMenuOpen(false)}>Оставить заявку</Button></a>
-          </div>
-        )}
-      </div>
-    </header>
-  );
-}
-
+// ─── Footer ───────────────────────────────────────────────────────────────────
 function Footer() {
+  const handleAnchor = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+    if (href.startsWith("#")) {
+      e.preventDefault();
+      const el = document.querySelector(href);
+      if (el) el.scrollIntoView({ behavior: "smooth" });
+    }
+  };
+
   return (
-    <footer className="bg-card border-t py-12">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-2.5">
-            <img src="/logo.png" alt="ВУДИНИ" className="h-8 w-auto object-contain" onError={(e) => {
-              (e.target as HTMLImageElement).style.display = "none";
-            }} />
+    <footer>
+      <div className="container footer-content">
+        <div className="footer-top">
+          <div className="footer-brand">
+            <div className="footer-logo">
+              <img src="/logo.png" alt="WOODINY" style={{ height: 48, width: "auto", filter: "brightness(0) invert(1)", marginBottom: 8 }} />
+            </div>
+            <p>Крупносерийное производство изделий из дерева. Собственное производство в Московской области.</p>
           </div>
-          <p className="text-sm text-muted-foreground">{new Date().getFullYear()} ВУДИНИ. Все права защищены.</p>
+          <div className="footer-links">
+            <h4>Навигация</h4>
+            <ul>
+              <li><a href="#about" onClick={(e) => handleAnchor(e, "#about")}>О компании</a></li>
+              <li><a href="#capabilities" onClick={(e) => handleAnchor(e, "#capabilities")}>Производство</a></li>
+              <li><a href="#production" onClick={(e) => handleAnchor(e, "#production")}>Наш цех</a></li>
+              <li><a href="#products" onClick={(e) => handleAnchor(e, "#products")}>Продукция</a></li>
+              <li><a href="#process" onClick={(e) => handleAnchor(e, "#process")}>Как работаем</a></li>
+              <li><a href="#contacts" onClick={(e) => handleAnchor(e, "#contacts")}>Контакты</a></li>
+            </ul>
+          </div>
+          <div className="footer-links">
+            <h4>Контакты</h4>
+            <ul>
+              <li><a href="tel:+74956467200" data-testid="link-footer-phone">8 (495) 646-72-00</a></li>
+              <li><a href="tel:+79671197997" data-testid="link-footer-mobile">8 (967) 119-79-97</a></li>
+              <li><a href="mailto:woodiny@mail.ru" data-testid="link-footer-email">woodiny@mail.ru</a></li>
+              <li><span>МО, Г.О. Одинцовский, д. Малые Вязёмы,<br />Петровский проезд, д.5 стр.1</span></li>
+              <li><span>Пн–Пт: 9:00–18:00</span></li>
+            </ul>
+          </div>
+        </div>
+        <div className="footer-bottom">
+          <p>© 2025 ООО «Вудини». Все права защищены.</p>
         </div>
       </div>
     </footer>
   );
 }
 
-// ─── Block renderer ───────────────────────────────────────────────────────────
-function renderBlock(block: Block) {
-  const data = parseData(block.data);
-  switch (block.type) {
-    case "hero":      return <HeroSection key={block.id} data={data} />;
-    case "clients":   return <ClientsSection key={block.id} data={data} />;
-    case "features":  return <FeaturesSection key={block.id} data={data} />;
-    case "products":  return <ProductsSection key={block.id} data={data} />;
-    case "portfolio": return <PortfolioSection key={block.id} data={data} />;
-    case "process":   return <ProcessSection key={block.id} data={data} />;
-    case "contacts":  return <ContactSection key={block.id} data={data} />;
-    default:          return null;
-  }
+// ─── Fade-in observer hook ────────────────────────────────────────────────────
+function useFadeInObserver() {
+  useEffect(() => {
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("visible");
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.12, rootMargin: "0px 0px -30px 0px" });
+
+    document.querySelectorAll(".landing-page .fade-in").forEach(el => observer.observe(el));
+    return () => observer.disconnect();
+  });
+}
+
+// ─── Track visit ──────────────────────────────────────────────────────────────
+function useTrackVisit() {
+  useEffect(() => {
+    fetch("/api/track", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ page: window.location.pathname, referrer: document.referrer }),
+    }).catch(() => {});
+  }, []);
 }
 
 // ─── Main Landing Page ────────────────────────────────────────────────────────
-export default function Landing() {
-  const { data: blocks, isLoading } = useQuery<Block[]>({
-    queryKey: ["/api/blocks"],
-  });
+export default function LandingPage() {
+  const { data: blocks } = useQuery<Block[]>({ queryKey: ["/api/blocks"] });
 
-  const sorted = [...(blocks || [])].sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
-  const active = sorted.filter(b => b.isActive);
+  useFadeInObserver();
+  useTrackVisit();
 
-  const heroBlock = active.find(b => b.type === "hero");
-  const afterHeroBlocks = active.filter(b => b.type !== "hero");
+  function getBlockData(type: string) {
+    const block = blocks?.find(b => b.type === type && b.isActive);
+    if (!block?.data) return {};
+    return parseData(block.data as string);
+  }
+
+  const heroData = getBlockData("hero");
+  const clientsData = getBlockData("clients");
+  const featuresData = getBlockData("features");
+  const productsData = getBlockData("products");
+  const portfolioData = getBlockData("portfolio");
+  const processData = getBlockData("process");
+  const contactsData = getBlockData("contacts");
 
   return (
-    <div className="min-h-screen">
+    <div className="landing-page">
       <Header />
-      <main className="pt-16">
-        {isLoading ? (
-          <div className="min-h-screen flex items-center justify-center">
-            <div className="flex flex-col items-center gap-3 text-muted-foreground">
-              <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
-              <p className="text-sm">Загрузка...</p>
-            </div>
-          </div>
-        ) : (
-          <>
-            {heroBlock && renderBlock(heroBlock)}
-            <StatsBar />
-            {afterHeroBlocks.map(block => renderBlock(block))}
-            <ReviewsSection />
-            <NewsSection />
-          </>
-        )}
-      </main>
+      <HeroSection data={heroData} />
+      <SectionDivider style={{ padding: "2rem 0" }} />
+      <ClientsSection data={clientsData} />
+      <PartnersSection />
+      <StatsSection />
+      <CapabilitiesSection data={featuresData} />
+      <ProductionSection />
+      <SectionDivider />
+      <ProductsSection data={productsData} />
+      <SectionDivider />
+      <ProcessSection data={processData} />
+      <PortfolioSection data={portfolioData} />
+      <ContactSection data={contactsData} />
       <Footer />
     </div>
   );
