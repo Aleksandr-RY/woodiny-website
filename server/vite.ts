@@ -31,6 +31,9 @@ export async function setupVite(server: Server, app: Express) {
 
   app.use(vite.middlewares);
 
+  // Pre-warm Vite so dependency optimization completes before first browser request
+  vite.warmupRequest("/src/main.tsx").catch(() => {});
+
   app.use("/{*path}", async (req, res, next) => {
     const url = req.originalUrl;
 
