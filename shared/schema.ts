@@ -124,3 +124,28 @@ export const pageVisits = pgTable("page_visits", {
 export const insertPageVisitSchema = createInsertSchema(pageVisits).omit({ id: true, createdAt: true });
 export type InsertPageVisit = z.infer<typeof insertPageVisitSchema>;
 export type PageVisit = typeof pageVisits.$inferSelect;
+
+export const blocks = pgTable("blocks", {
+  id: serial("id").primaryKey(),
+  type: text("type").notNull(),
+  order: integer("order").default(0),
+  data: text("data").notNull().default("{}"),
+  isActive: boolean("is_active").notNull().default(true),
+});
+
+export const insertBlockSchema = createInsertSchema(blocks).omit({ id: true });
+export type InsertBlock = z.infer<typeof insertBlockSchema>;
+export type Block = typeof blocks.$inferSelect;
+
+export const portfolio = pgTable("portfolio", {
+  id: serial("id").primaryKey(),
+  title: text("title").notNull(),
+  description: text("description"),
+  imageUrl: text("image_url"),
+  sortOrder: integer("sort_order").default(0),
+  isActive: boolean("is_active").notNull().default(true),
+});
+
+export const insertPortfolioSchema = createInsertSchema(portfolio).omit({ id: true });
+export type InsertPortfolio = z.infer<typeof insertPortfolioSchema>;
+export type Portfolio = typeof portfolio.$inferSelect;

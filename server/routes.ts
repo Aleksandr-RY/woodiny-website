@@ -14,7 +14,12 @@ import {
   insertReviewSchema,
   insertStaffSchema,
   insertNewsSchema,
+  insertBlockSchema,
+  insertPortfolioSchema,
 } from "@shared/schema";
+import { db } from "./db";
+import { blocks, portfolio } from "@shared/schema";
+import { eq, asc } from "drizzle-orm";
 
 const MemoryStore = createMemoryStore(session);
 
@@ -60,17 +65,7 @@ export async function registerRoutes(
   httpServer: Server,
   app: Express
 ): Promise<Server> {
-  const clientDir = path.resolve(process.cwd(), "client");
   const isProduction = process.env.NODE_ENV === "production";
-
-  app.get("/", (_req, res) => {
-    // In production, landing.html is built into dist/public/ via client/public/.
-    // __dirname points to dist/ when running the bundled server.
-    const landingPath = isProduction
-      ? path.resolve(__dirname, "public", "landing.html")
-      : path.resolve(clientDir, "landing.html");
-    res.sendFile(landingPath);
-  });
 
   app.use(
     session({
@@ -474,6 +469,100 @@ export async function registerRoutes(
     } catch (e: any) {
       safeError(res, 500, e);
     }
+  });
+
+  // ─── BLOCKS (Page Builder) ───────────────────────────────────────────────
+  app.get("/api/blocks", async (_req, res) => {
+    try {
+      const rows = await db.select().from(blocks).orderBy(asc(blocks.order));
+      if (rows.length === 0) {
+        const defaultBlocks = [
+          { type: "hero", order: 0, data: JSON.stringify({ title: "Крупносерийное производство изделий из дерева", subtitle: "Разделочные доски, подносы, кухонные принадлежности и декор из массива. Работаем с B2B-клиентами по всей России.", cta: "Оставить заявку" }), isActive: true },
+          { type: "clients", order: 1, data: JSON.stringify({ title: "Нам доверяют" }), isActive: true },
+          { type: "features", order: 2, data: JSON.stringify({ title: "Почему выбирают нас", items: [{ icon: "factory", title: "Собственное производство", description: "1500 м² в Московской области" }, { icon: "truck", title: "Быстрая доставка", description: "По всей России" }, { icon: "shield", title: "Гарантия качества", description: "Контроль на каждом этапе" }] }), isActive: true },
+          { type: "products", order: 3, data: JSON.stringify({ title: "Каталог продукции", description: "Широкий ассортимент деревянных изделий для вашего бизнеса" }), isActive: true },
+          { type: "portfolio", order: 4, data: JSON.stringify({ title: "Портфолио", description: "Примеры наших работ" }), isActive: true },
+          { type: "process", order: 5, data: JSON.stringify({ title: "Как мы работаем", steps: [{ title: "Заявка", description: "Оставьте заявку или позвоните нам" }, { title: "Расчёт", description: "Рассчитаем стоимость и сроки" }, { title: "Производство", description: "Изготовим в срок с контролем качества" }, { title: "Доставка", description: "Доставим в любую точку России" }] }), isActive: true },
+          { type: "contacts", order: 6, data: JSON.stringify({ title: "Свяжитесь с нами", phone: "+7 (495) 000-00-00", email: "info@woodiny.ru", address: "Московская область" }), isActive: true },
+        ];
+        const inserted = await db.insert(blocks).values(defaultBlocks).returning();
+        return res.json(inserted);
+      }
+      res.json(rows);
+    } catch (e: any) { safeError(res, 500, e); }
+  });
+
+  app.post("/api/blocks", requireAuth, async (req, res) => {
+    try {
+      const parsed = insertBlockSchema.safeParse(req.body);
+      if (!parsed.success) return res.status(400).json({ message: parsed.error.errors[0].message });
+      const [row] = await db.insert(blocks).values(parsed.data).returning();
+      res.status(201).json(row);
+    } catch (e: any) { safeError(res, 500, e); }
+  });
+
+  app.patch("/api/blocks/:id", requireAuth, async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const [row] = await db.update(blocks).set(req.body).where(eq(blocks.id, id)).returning();
+      if (!row) return res.status(404).json({ message: "Блок не найден" });
+      res.json(row);
+    } catch (e: any) { safeError(res, 500, e); }
+  });
+
+  app.delete("/api/blocks/:id", requireAuth, async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      await db.delete(blocks).where(eq(blocks.id, id));
+      res.json({ ok: true });
+    } catch (e: any) { safeError(res, 500, e); }
+  });
+
+  // ─── PORTFOLIO ────────────────────────────────────────────────────────────
+  app.get("/api/portfolio", async (_req, res) => {
+    try {
+      const rows = await db.select().from(portfolio).orderBy(asc(portfolio.sortOrder));
+      res.json(rows);
+    } catch (e: any) { safeError(res, 500, e); }
+  });
+
+  app.post("/api/portfolio", requireAuth, async (req, res) => {
+    try {
+      const parsed = insertPortfolioSchema.safeParse(req.body);
+      if (!parsed.success) return res.status(400).json({ message: parsed.error.errors[0].message });
+      const [row] = await db.insert(portfolio).values(parsed.data).returning();
+      res.status(201).json(row);
+    } catch (e: any) { safeError(res, 500, e); }
+  });
+
+  app.patch("/api/portfolio/:id", requireAuth, async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const [row] = await db.update(portfolio).set(req.body).where(eq(portfolio.id, id)).returning();
+      if (!row) return res.status(404).json({ message: "Работа не найдена" });
+      res.json(row);
+    } catch (e: any) { safeError(res, 500, e); }
+  });
+
+  app.delete("/api/portfolio/:id", requireAuth, async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      await db.delete(portfolio).where(eq(portfolio.id, id));
+      res.json({ ok: true });
+    } catch (e: any) { safeError(res, 500, e); }
+  });
+
+  app.post("/api/upload-portfolio-image/:id", requireAuth, (req, res) => {
+    upload.single("image")(req, res, async (err) => {
+      if (err) return res.status(400).json({ message: err.message });
+      if (!req.file) return res.status(400).json({ message: "Файл не выбран" });
+      const id = parseInt(req.params.id);
+      const imageUrl = `/uploads/${req.file.filename}`;
+      try {
+        const [row] = await db.update(portfolio).set({ imageUrl }).where(eq(portfolio.id, id)).returning();
+        res.json(row);
+      } catch (e: any) { safeError(res, 500, e); }
+    });
   });
 
   return httpServer;

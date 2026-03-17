@@ -6,7 +6,7 @@ import { useMutation } from "@tanstack/react-query";
 import {
   LayoutDashboard, MessageSquare, Package, Handshake,
   Star, Users, Newspaper, Phone, Search, BarChart3,
-  LogOut, Menu, X, PenTool, Images
+  LogOut, Menu, X, PenTool, Images, LayoutTemplate, GalleryHorizontalEnd
 } from "lucide-react";
 import { useState } from "react";
 const logoPath = "/woodiny-icon.png";
@@ -14,6 +14,8 @@ const logoPath = "/woodiny-icon.png";
 const navItems = [
   { path: "/admin", label: "Дашборд", icon: LayoutDashboard },
   { path: "/admin/inquiries", label: "Заявки", icon: MessageSquare },
+  { path: "/admin/blocks", label: "Редактор страницы", icon: LayoutTemplate },
+  { path: "/admin/portfolio", label: "Портфолио", icon: GalleryHorizontalEnd },
   { path: "/admin/products", label: "Каталог", icon: Package },
   { path: "/admin/partners", label: "Партнёры", icon: Handshake },
   { path: "/admin/reviews", label: "Отзывы", icon: Star },
@@ -23,7 +25,7 @@ const navItems = [
   { path: "/admin/settings", label: "Контакты", icon: Phone },
   { path: "/admin/seo", label: "SEO", icon: Search },
   { path: "/admin/stats", label: "Статистика", icon: BarChart3 },
-  { path: "/admin/editor", label: "Редактор сайта", icon: PenTool },
+  { path: "/admin/editor", label: "Доп. редактор", icon: PenTool },
 ];
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {

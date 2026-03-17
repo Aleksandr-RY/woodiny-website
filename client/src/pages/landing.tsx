@@ -11,12 +11,29 @@ import {
   Trees, Phone, Mail, MapPin, Clock, Send,
   ChevronRight, Star, Factory, Truck, Shield,
   Users, ArrowRight, MessageCircle, CheckCircle2,
-  Package, Layers, Award, Hammer
+  Package, Layers, Award, Hammer, Settings2, Image as ImageIcon
 } from "lucide-react";
 import { SiWhatsapp, SiTelegram } from "react-icons/si";
-import type { Product, Review, Partner, SiteSetting, News } from "@shared/schema";
+import type { Product, Review, Partner, SiteSetting, News, Block, Portfolio } from "@shared/schema";
 
-function HeroSection() {
+// ─── Helpers ────────────────────────────────────────────────────────────────
+function parseData(raw: string): any {
+  try { return JSON.parse(raw); } catch { return {}; }
+}
+
+const FEATURE_ICONS: Record<string, any> = {
+  factory: Factory, truck: Truck, shield: Shield,
+  users: Users, layers: Layers, award: Award, hammer: Hammer,
+  settings: Settings2, star: Star, package: Package,
+};
+
+// ─── Hero ────────────────────────────────────────────────────────────────────
+function HeroSection({ data }: { data: any }) {
+  const title = data.title || "Крупносерийное производство изделий из дерева";
+  const subtitle = data.subtitle || "Разделочные доски, подносы, кухонные принадлежности и декор из массива. Работаем с B2B-клиентами по всей России.";
+  const cta = data.cta || "Оставить заявку";
+  const ctaSecondary = data.ctaSecondary || "Каталог продукции";
+
   return (
     <section className="relative min-h-[90vh] flex items-center overflow-hidden">
       <div className="absolute inset-0 bg-gradient-to-br from-amber-950 via-amber-900 to-stone-900" />
@@ -30,23 +47,25 @@ function HeroSection() {
             Собственное производство в Московской области
           </Badge>
           <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white leading-tight mb-6" data-testid="text-hero-title">
-            Крупносерийное производство
-            <span className="block text-amber-300 mt-2">изделий из дерева</span>
+            {title.includes("\n") ? title.split("\n").map((line: string, i: number) => (
+              <span key={i} className={i > 0 ? "block text-amber-300 mt-2" : ""}>{line}</span>
+            )) : (
+              <>
+                {title.split(" ").slice(0, 3).join(" ")}
+                <span className="block text-amber-300 mt-2">{title.split(" ").slice(3).join(" ") || "изделий из дерева"}</span>
+              </>
+            )}
           </h1>
-          <p className="text-lg sm:text-xl text-amber-100/80 leading-relaxed mb-10 max-w-2xl">
-            Разделочные доски, подносы, кухонные принадлежности и декор из массива.
-            Работаем с B2B-клиентами по всей России. Индивидуальные заказы от 100 штук.
-          </p>
+          <p className="text-lg sm:text-xl text-amber-100/80 leading-relaxed mb-10 max-w-2xl">{subtitle}</p>
           <div className="flex flex-col sm:flex-row gap-4">
             <a href="#contact">
               <Button size="lg" className="text-base px-8" data-testid="button-hero-cta">
-                Оставить заявку
-                <ArrowRight className="ml-2 h-5 w-5" />
+                {cta}<ArrowRight className="ml-2 h-5 w-5" />
               </Button>
             </a>
             <a href="#products">
               <Button size="lg" variant="outline" className="text-base px-8 border-amber-400/30 text-amber-100 bg-white/5 backdrop-blur-sm" data-testid="button-hero-catalog">
-                Каталог продукции
+                {ctaSecondary}
               </Button>
             </a>
           </div>
@@ -57,36 +76,31 @@ function HeroSection() {
   );
 }
 
-function AdvantagesSection() {
-  const advantages = [
-    { icon: Factory, title: "Своё производство", desc: "Полный цикл от заготовки до упаковки на собственной фабрике в МО" },
-    { icon: Layers, title: "Любые объёмы", desc: "От 100 до 100 000 единиц. Гибкие сроки и масштабируемость" },
-    { icon: Award, title: "Качество древесины", desc: "Работаем с дубом, буком, ясенем, берёзой. Сертифицированное сырьё" },
-    { icon: Truck, title: "Доставка по РФ", desc: "Отправка транспортными компаниями в любой регион России" },
-    { icon: Shield, title: "Гарантия качества", desc: "Контроль на каждом этапе. Замена при обнаружении брака" },
-    { icon: Hammer, title: "Брендирование", desc: "Нанесение логотипа гравировкой или печатью на готовые изделия" },
-  ];
+// ─── Clients / Partners ───────────────────────────────────────────────────────
+function ClientsSection({ data }: { data: any }) {
+  const { data: partners } = useQuery<Partner[]>({ queryKey: ["/api/partners"] });
+  const active = partners?.filter(p => p.isActive) || [];
+  if (!active.length) return null;
+  const title = data.title || "Нам доверяют";
 
   return (
-    <section className="py-20 sm:py-28 bg-background">
+    <section className="py-16 sm:py-20 bg-card/50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-16">
-          <h2 className="text-3xl sm:text-4xl font-bold mb-4" data-testid="text-advantages-title">Почему выбирают нас</h2>
-          <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-            Более 10 лет производим качественные изделия из натурального дерева для бизнеса
-          </p>
+        <div className="text-center mb-12">
+          <h2 className="text-2xl sm:text-3xl font-bold mb-3" data-testid="text-partners-section">{title}</h2>
+          <p className="text-muted-foreground">Наши партнёры и клиенты</p>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {advantages.map((item, i) => (
-            <Card key={i} className="group hover-elevate transition-all">
-              <CardContent className="p-6">
-                <div className="w-12 h-12 rounded-md bg-primary/10 flex items-center justify-center mb-4">
-                  <item.icon className="h-6 w-6 text-primary" />
+        <div className="flex flex-wrap items-center justify-center gap-8 lg:gap-12">
+          {active.map((p) => (
+            <div key={p.id} className="flex items-center gap-3 text-muted-foreground" data-testid={`partner-logo-${p.id}`}>
+              {p.logoUrl ? (
+                <img src={p.logoUrl} alt={p.name} className="h-10 w-auto object-contain opacity-70" />
+              ) : (
+                <div className="flex items-center gap-2 px-4 py-2 rounded-md bg-muted/50">
+                  <Users className="h-4 w-4" /><span className="font-medium text-sm">{p.name}</span>
                 </div>
-                <h3 className="text-lg font-semibold mb-2">{item.title}</h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">{item.desc}</p>
-              </CardContent>
-            </Card>
+              )}
+            </div>
           ))}
         </div>
       </div>
@@ -94,23 +108,66 @@ function AdvantagesSection() {
   );
 }
 
-function ProductsSection() {
-  const { data: products } = useQuery<Product[]>({ queryKey: ["/api/products"] });
-  const activeProducts = products?.filter(p => p.isActive) || [];
+// ─── Features / Advantages ────────────────────────────────────────────────────
+function FeaturesSection({ data }: { data: any }) {
+  const title = data.title || "Почему выбирают нас";
+  const defaultItems = [
+    { icon: "factory", title: "Своё производство", description: "Полный цикл от заготовки до упаковки на собственной фабрике в МО" },
+    { icon: "layers", title: "Любые объёмы", description: "От 100 до 100 000 единиц. Гибкие сроки и масштабируемость" },
+    { icon: "award", title: "Качество древесины", description: "Работаем с дубом, буком, ясенем, берёзой. Сертифицированное сырьё" },
+    { icon: "truck", title: "Доставка по РФ", description: "Отправка транспортными компаниями в любой регион России" },
+    { icon: "shield", title: "Гарантия качества", description: "Контроль на каждом этапе. Замена при обнаружении брака" },
+    { icon: "hammer", title: "Брендирование", description: "Нанесение логотипа гравировкой или печатью на готовые изделия" },
+  ];
+  const items: any[] = data.items?.length ? data.items : defaultItems;
 
-  if (!activeProducts.length) return null;
+  return (
+    <section className="py-20 sm:py-28 bg-background">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="text-center mb-16">
+          <h2 className="text-3xl sm:text-4xl font-bold mb-4" data-testid="text-advantages-title">{title}</h2>
+          <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
+            Более 10 лет производим качественные изделия из натурального дерева для бизнеса
+          </p>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {items.map((item: any, i: number) => {
+            const Icon = FEATURE_ICONS[item.icon] || Star;
+            return (
+              <Card key={i} className="group hover-elevate transition-all">
+                <CardContent className="p-6">
+                  <div className="w-12 h-12 rounded-md bg-primary/10 flex items-center justify-center mb-4">
+                    <Icon className="h-6 w-6 text-primary" />
+                  </div>
+                  <h3 className="text-lg font-semibold mb-2">{item.title}</h3>
+                  <p className="text-sm text-muted-foreground leading-relaxed">{item.description}</p>
+                </CardContent>
+              </Card>
+            );
+          })}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// ─── Products ────────────────────────────────────────────────────────────────
+function ProductsSection({ data }: { data: any }) {
+  const { data: products } = useQuery<Product[]>({ queryKey: ["/api/products"] });
+  const active = products?.filter(p => p.isActive) || [];
+  if (!active.length) return null;
+  const title = data.title || "Наша продукция";
+  const description = data.description || "Широкий ассортимент изделий из массива дерева для кухни, сервировки и декора";
 
   return (
     <section id="products" className="py-20 sm:py-28 bg-card/50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
-          <h2 className="text-3xl sm:text-4xl font-bold mb-4" data-testid="text-products-section">Наша продукция</h2>
-          <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-            Широкий ассортимент изделий из массива дерева для кухни, сервировки и декора
-          </p>
+          <h2 className="text-3xl sm:text-4xl font-bold mb-4" data-testid="text-products-section">{title}</h2>
+          <p className="text-muted-foreground text-lg max-w-2xl mx-auto">{description}</p>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {activeProducts.map((product) => (
+          {active.map((product) => (
             <Card key={product.id} className="group hover-elevate transition-all" data-testid={`card-landing-product-${product.id}`}>
               <CardContent className="p-0">
                 {product.imageUrl ? (
@@ -125,16 +182,10 @@ function ProductsSection() {
                 <div className="p-5">
                   <div className="flex items-start justify-between gap-2 mb-2">
                     <h3 className="font-semibold text-lg">{product.name}</h3>
-                    {product.price && (
-                      <Badge variant="secondary" className="shrink-0">{product.price}</Badge>
-                    )}
+                    {product.price && <Badge variant="secondary" className="shrink-0">{product.price}</Badge>}
                   </div>
-                  {product.category && (
-                    <span className="text-xs text-muted-foreground">{product.category}</span>
-                  )}
-                  {product.description && (
-                    <p className="text-sm text-muted-foreground mt-2 leading-relaxed line-clamp-2">{product.description}</p>
-                  )}
+                  {product.category && <span className="text-xs text-muted-foreground">{product.category}</span>}
+                  {product.description && <p className="text-sm text-muted-foreground mt-2 leading-relaxed line-clamp-2">{product.description}</p>}
                 </div>
               </CardContent>
             </Card>
@@ -145,23 +196,98 @@ function ProductsSection() {
   );
 }
 
+// ─── Portfolio ────────────────────────────────────────────────────────────────
+function PortfolioSection({ data }: { data: any }) {
+  const { data: portfolioItems } = useQuery<Portfolio[]>({ queryKey: ["/api/portfolio"] });
+  const active = portfolioItems?.filter(p => p.isActive) || [];
+  if (!active.length) return null;
+  const title = data.title || "Портфолио";
+  const description = data.description || "Примеры наших работ";
+
+  return (
+    <section className="py-20 sm:py-28 bg-background">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="text-center mb-16">
+          <h2 className="text-3xl sm:text-4xl font-bold mb-4">{title}</h2>
+          <p className="text-muted-foreground text-lg max-w-2xl mx-auto">{description}</p>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {active.map((item) => (
+            <Card key={item.id} className="group hover-elevate transition-all overflow-hidden">
+              <div className="aspect-[4/3] overflow-hidden bg-muted">
+                {item.imageUrl ? (
+                  <img src={item.imageUrl} alt={item.title} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center">
+                    <ImageIcon className="h-12 w-12 text-muted-foreground/30" />
+                  </div>
+                )}
+              </div>
+              <CardContent className="p-5">
+                <h3 className="font-semibold text-lg">{item.title}</h3>
+                {item.description && <p className="text-sm text-muted-foreground mt-2 line-clamp-2">{item.description}</p>}
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// ─── Process ─────────────────────────────────────────────────────────────────
+function ProcessSection({ data }: { data: any }) {
+  const title = data.title || "Как мы работаем";
+  const defaultSteps = [
+    { title: "Заявка", description: "Оставьте заявку или позвоните нам" },
+    { title: "Расчёт", description: "Рассчитаем стоимость и сроки" },
+    { title: "Производство", description: "Изготовим в срок с контролем качества" },
+    { title: "Доставка", description: "Доставим в любую точку России" },
+  ];
+  const steps: any[] = data.steps?.length ? data.steps : defaultSteps;
+
+  return (
+    <section className="py-20 sm:py-28 bg-card/50">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="text-center mb-16">
+          <h2 className="text-3xl sm:text-4xl font-bold mb-4">{title}</h2>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          {steps.map((step: any, i: number) => (
+            <div key={i} className="relative">
+              <div className="flex flex-col items-center text-center">
+                <div className="w-14 h-14 rounded-full bg-primary flex items-center justify-center mb-4 text-primary-foreground font-bold text-xl">
+                  {i + 1}
+                </div>
+                <h3 className="font-semibold text-lg mb-2">{step.title}</h3>
+                <p className="text-sm text-muted-foreground leading-relaxed">{step.description}</p>
+              </div>
+              {i < steps.length - 1 && (
+                <div className="hidden lg:block absolute top-7 left-[calc(50%+2rem)] w-[calc(100%-4rem)] h-0.5 bg-border" />
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// ─── Reviews ─────────────────────────────────────────────────────────────────
 function ReviewsSection() {
   const { data: reviews } = useQuery<Review[]>({ queryKey: ["/api/reviews"] });
-  const activeReviews = reviews?.filter(r => r.isActive) || [];
-
-  if (!activeReviews.length) return null;
+  const active = reviews?.filter(r => r.isActive) || [];
+  if (!active.length) return null;
 
   return (
     <section className="py-20 sm:py-28 bg-background">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
           <h2 className="text-3xl sm:text-4xl font-bold mb-4" data-testid="text-reviews-section">Отзывы клиентов</h2>
-          <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-            Нам доверяют компании по всей России
-          </p>
+          <p className="text-muted-foreground text-lg max-w-2xl mx-auto">Нам доверяют компании по всей России</p>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {activeReviews.map((review) => (
+          {active.map((review) => (
             <Card key={review.id} className="hover-elevate transition-all" data-testid={`card-landing-review-${review.id}`}>
               <CardContent className="p-6">
                 <div className="flex gap-0.5 mb-4">
@@ -172,15 +298,11 @@ function ReviewsSection() {
                 <p className="text-sm leading-relaxed mb-5">{review.text}</p>
                 <div className="flex items-center gap-3 pt-4 border-t">
                   <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-                    <span className="text-sm font-bold text-primary">
-                      {review.authorName.charAt(0).toUpperCase()}
-                    </span>
+                    <span className="text-sm font-bold text-primary">{review.authorName.charAt(0).toUpperCase()}</span>
                   </div>
                   <div>
                     <p className="font-medium text-sm">{review.authorName}</p>
-                    {review.company && (
-                      <p className="text-xs text-muted-foreground">{review.company}</p>
-                    )}
+                    {review.company && <p className="text-xs text-muted-foreground">{review.company}</p>}
                   </div>
                 </div>
               </CardContent>
@@ -192,44 +314,11 @@ function ReviewsSection() {
   );
 }
 
-function PartnersSection() {
-  const { data: partners } = useQuery<Partner[]>({ queryKey: ["/api/partners"] });
-  const activePartners = partners?.filter(p => p.isActive) || [];
-
-  if (!activePartners.length) return null;
-
-  return (
-    <section className="py-16 sm:py-20 bg-card/50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-12">
-          <h2 className="text-2xl sm:text-3xl font-bold mb-3" data-testid="text-partners-section">Нам доверяют</h2>
-          <p className="text-muted-foreground">Наши партнёры и клиенты</p>
-        </div>
-        <div className="flex flex-wrap items-center justify-center gap-8 lg:gap-12">
-          {activePartners.map((partner) => (
-            <div key={partner.id} className="flex items-center gap-3 text-muted-foreground" data-testid={`partner-logo-${partner.id}`}>
-              {partner.logoUrl ? (
-                <img src={partner.logoUrl} alt={partner.name} className="h-10 w-auto object-contain opacity-70" />
-              ) : (
-                <div className="flex items-center gap-2 px-4 py-2 rounded-md bg-muted/50">
-                  <Users className="h-4 w-4" />
-                  <span className="font-medium text-sm">{partner.name}</span>
-                </div>
-              )}
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
+// ─── News ─────────────────────────────────────────────────────────────────────
 function NewsSection() {
   const { data: newsList } = useQuery<News[]>({ queryKey: ["/api/news"] });
   const published = newsList?.filter(n => n.isPublished) || [];
-
   if (!published.length) return null;
-
   const catLabels: Record<string, string> = { news: "Новость", promo: "Акция", offer: "Спецпредложение" };
 
   return (
@@ -245,11 +334,7 @@ function NewsSection() {
               <CardContent className="p-6">
                 <div className="flex items-center gap-2 mb-3">
                   <Badge variant="outline">{catLabels[item.category || "news"] || item.category}</Badge>
-                  {item.createdAt && (
-                    <span className="text-xs text-muted-foreground">
-                      {new Date(item.createdAt).toLocaleDateString("ru-RU")}
-                    </span>
-                  )}
+                  {item.createdAt && <span className="text-xs text-muted-foreground">{new Date(item.createdAt).toLocaleDateString("ru-RU")}</span>}
                 </div>
                 <h3 className="font-semibold text-lg mb-2">{item.title}</h3>
                 <p className="text-sm text-muted-foreground leading-relaxed line-clamp-3">{item.content}</p>
@@ -262,7 +347,8 @@ function NewsSection() {
   );
 }
 
-function ContactSection() {
+// ─── Contacts ─────────────────────────────────────────────────────────────────
+function ContactSection({ data }: { data: any }) {
   const { toast } = useToast();
   const { data: settings } = useQuery<SiteSetting[]>({
     queryKey: ["/api/settings/public"],
@@ -274,9 +360,13 @@ function ContactSection() {
   });
 
   const [form, setForm] = useState({ name: "", phone: "", email: "", company: "", message: "" });
-
   const settingsMap: Record<string, string> = {};
   settings?.forEach(s => { settingsMap[s.key] = s.value; });
+
+  const phone = data.phone || settingsMap.phone;
+  const email = data.email || settingsMap.email;
+  const address = data.address || settingsMap.address;
+  const title = data.title || "Свяжитесь с нами";
 
   const submitMutation = useMutation({
     mutationFn: () => apiRequest("POST", "/api/inquiries", form),
@@ -284,16 +374,14 @@ function ContactSection() {
       toast({ title: "Заявка отправлена!", description: "Мы свяжемся с вами в ближайшее время" });
       setForm({ name: "", phone: "", email: "", company: "", message: "" });
     },
-    onError: () => {
-      toast({ title: "Ошибка", description: "Не удалось отправить заявку", variant: "destructive" });
-    },
+    onError: () => toast({ title: "Ошибка", description: "Не удалось отправить заявку", variant: "destructive" }),
   });
 
   return (
     <section id="contact" className="py-20 sm:py-28 bg-card/50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
-          <h2 className="text-3xl sm:text-4xl font-bold mb-4" data-testid="text-contact-section">Свяжитесь с нами</h2>
+          <h2 className="text-3xl sm:text-4xl font-bold mb-4" data-testid="text-contact-section">{title}</h2>
           <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
             Оставьте заявку и мы подготовим индивидуальное предложение для вашего бизнеса
           </p>
@@ -302,69 +390,32 @@ function ContactSection() {
           <div className="lg:col-span-3">
             <Card>
               <CardContent className="p-6 sm:p-8">
-                <form
-                  onSubmit={(e) => { e.preventDefault(); submitMutation.mutate(); }}
-                  className="space-y-5"
-                >
+                <form onSubmit={(e) => { e.preventDefault(); submitMutation.mutate(); }} className="space-y-5">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                       <label className="text-sm font-medium mb-1.5 block">Ваше имя *</label>
-                      <Input
-                        data-testid="input-contact-name"
-                        placeholder="Иван Иванов"
-                        value={form.name}
-                        onChange={(e) => setForm({ ...form, name: e.target.value })}
-                        required
-                      />
+                      <Input data-testid="input-contact-name" placeholder="Иван Иванов" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required />
                     </div>
                     <div>
                       <label className="text-sm font-medium mb-1.5 block">Телефон</label>
-                      <Input
-                        data-testid="input-contact-phone"
-                        placeholder="+7 (XXX) XXX-XX-XX"
-                        value={form.phone}
-                        onChange={(e) => setForm({ ...form, phone: e.target.value })}
-                      />
+                      <Input data-testid="input-contact-phone" placeholder="+7 (XXX) XXX-XX-XX" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} />
                     </div>
                   </div>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                       <label className="text-sm font-medium mb-1.5 block">Email</label>
-                      <Input
-                        data-testid="input-contact-email"
-                        type="email"
-                        placeholder="email@company.ru"
-                        value={form.email}
-                        onChange={(e) => setForm({ ...form, email: e.target.value })}
-                      />
+                      <Input data-testid="input-contact-email" type="email" placeholder="email@company.ru" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
                     </div>
                     <div>
                       <label className="text-sm font-medium mb-1.5 block">Компания</label>
-                      <Input
-                        data-testid="input-contact-company"
-                        placeholder="ООО «Компания»"
-                        value={form.company}
-                        onChange={(e) => setForm({ ...form, company: e.target.value })}
-                      />
+                      <Input data-testid="input-contact-company" placeholder="ООО «Компания»" value={form.company} onChange={(e) => setForm({ ...form, company: e.target.value })} />
                     </div>
                   </div>
                   <div>
                     <label className="text-sm font-medium mb-1.5 block">Сообщение</label>
-                    <Textarea
-                      data-testid="input-contact-message"
-                      placeholder="Опишите ваш запрос: какие изделия, объём, сроки..."
-                      rows={4}
-                      value={form.message}
-                      onChange={(e) => setForm({ ...form, message: e.target.value })}
-                    />
+                    <Textarea data-testid="input-contact-message" placeholder="Опишите ваш запрос: какие изделия, объём, сроки..." rows={4} value={form.message} onChange={(e) => setForm({ ...form, message: e.target.value })} />
                   </div>
-                  <Button
-                    data-testid="button-submit-inquiry"
-                    type="submit"
-                    size="lg"
-                    className="w-full sm:w-auto px-8"
-                    disabled={submitMutation.isPending}
-                  >
+                  <Button data-testid="button-submit-inquiry" type="submit" size="lg" className="w-full sm:w-auto px-8" disabled={submitMutation.isPending}>
                     <Send className="mr-2 h-4 w-4" />
                     {submitMutation.isPending ? "Отправка..." : "Отправить заявку"}
                   </Button>
@@ -373,75 +424,51 @@ function ContactSection() {
             </Card>
           </div>
           <div className="lg:col-span-2 space-y-4">
-            {settingsMap.phone && (
-              <a href={`tel:${settingsMap.phone.replace(/\D/g, '')}`} className="block">
+            {phone && (
+              <a href={`tel:${phone.replace(/\D/g, '')}`} className="block">
                 <Card className="hover-elevate transition-all">
                   <CardContent className="p-5 flex items-center gap-4">
-                    <div className="w-11 h-11 rounded-md bg-primary/10 flex items-center justify-center shrink-0">
-                      <Phone className="h-5 w-5 text-primary" />
-                    </div>
-                    <div>
-                      <p className="text-xs text-muted-foreground mb-0.5">Телефон</p>
-                      <p className="font-semibold">{settingsMap.phone}</p>
-                    </div>
+                    <div className="w-11 h-11 rounded-md bg-primary/10 flex items-center justify-center shrink-0"><Phone className="h-5 w-5 text-primary" /></div>
+                    <div><p className="text-xs text-muted-foreground mb-0.5">Телефон</p><p className="font-semibold">{phone}</p></div>
                   </CardContent>
                 </Card>
               </a>
             )}
-            {settingsMap.email && (
-              <a href={`mailto:${settingsMap.email}`} className="block">
+            {email && (
+              <a href={`mailto:${email}`} className="block">
                 <Card className="hover-elevate transition-all">
                   <CardContent className="p-5 flex items-center gap-4">
-                    <div className="w-11 h-11 rounded-md bg-primary/10 flex items-center justify-center shrink-0">
-                      <Mail className="h-5 w-5 text-primary" />
-                    </div>
-                    <div>
-                      <p className="text-xs text-muted-foreground mb-0.5">Email</p>
-                      <p className="font-semibold">{settingsMap.email}</p>
-                    </div>
+                    <div className="w-11 h-11 rounded-md bg-primary/10 flex items-center justify-center shrink-0"><Mail className="h-5 w-5 text-primary" /></div>
+                    <div><p className="text-xs text-muted-foreground mb-0.5">Email</p><p className="font-semibold">{email}</p></div>
                   </CardContent>
                 </Card>
               </a>
             )}
-            {settingsMap.address && (
+            {address && (
               <Card>
                 <CardContent className="p-5 flex items-center gap-4">
-                  <div className="w-11 h-11 rounded-md bg-primary/10 flex items-center justify-center shrink-0">
-                    <MapPin className="h-5 w-5 text-primary" />
-                  </div>
-                  <div>
-                    <p className="text-xs text-muted-foreground mb-0.5">Адрес</p>
-                    <p className="font-medium text-sm">{settingsMap.address}</p>
-                  </div>
+                  <div className="w-11 h-11 rounded-md bg-primary/10 flex items-center justify-center shrink-0"><MapPin className="h-5 w-5 text-primary" /></div>
+                  <div><p className="text-xs text-muted-foreground mb-0.5">Адрес</p><p className="font-medium text-sm">{address}</p></div>
                 </CardContent>
               </Card>
             )}
             {settingsMap.work_hours && (
               <Card>
                 <CardContent className="p-5 flex items-center gap-4">
-                  <div className="w-11 h-11 rounded-md bg-primary/10 flex items-center justify-center shrink-0">
-                    <Clock className="h-5 w-5 text-primary" />
-                  </div>
-                  <div>
-                    <p className="text-xs text-muted-foreground mb-0.5">Часы работы</p>
-                    <p className="font-medium text-sm">{settingsMap.work_hours}</p>
-                  </div>
+                  <div className="w-11 h-11 rounded-md bg-primary/10 flex items-center justify-center shrink-0"><Clock className="h-5 w-5 text-primary" /></div>
+                  <div><p className="text-xs text-muted-foreground mb-0.5">Часы работы</p><p className="font-medium text-sm">{settingsMap.work_hours}</p></div>
                 </CardContent>
               </Card>
             )}
             <div className="flex gap-3 pt-2">
-              {settingsMap.whatsapp && (
-                <a href={settingsMap.whatsapp} target="_blank" rel="noopener noreferrer">
-                  <Button variant="outline" size="icon" data-testid="link-whatsapp">
-                    <SiWhatsapp className="h-4 w-4" />
-                  </Button>
+              {(data.whatsapp || settingsMap.whatsapp) && (
+                <a href={data.whatsapp || settingsMap.whatsapp} target="_blank" rel="noopener noreferrer">
+                  <Button variant="outline" size="icon" data-testid="link-whatsapp"><SiWhatsapp className="h-4 w-4" /></Button>
                 </a>
               )}
               {settingsMap.telegram && (
                 <a href={settingsMap.telegram} target="_blank" rel="noopener noreferrer">
-                  <Button variant="outline" size="icon" data-testid="link-telegram">
-                    <SiTelegram className="h-4 w-4" />
-                  </Button>
+                  <Button variant="outline" size="icon" data-testid="link-telegram"><SiTelegram className="h-4 w-4" /></Button>
                 </a>
               )}
             </div>
@@ -452,75 +479,7 @@ function ContactSection() {
   );
 }
 
-function Header() {
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-
-  return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
-          <a href="/" className="flex items-center gap-2.5" data-testid="link-logo">
-            <div className="w-9 h-9 rounded-md bg-primary flex items-center justify-center">
-              <Trees className="h-5 w-5 text-primary-foreground" />
-            </div>
-            <span className="font-bold text-xl">ВУДИНИ</span>
-          </a>
-          <nav className="hidden md:flex items-center gap-8">
-            <a href="#products" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors" data-testid="link-nav-products">Продукция</a>
-            <a href="#contact" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors" data-testid="link-nav-contact">Контакты</a>
-            <a href="/admin/login" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors" data-testid="link-nav-admin">Админ</a>
-          </nav>
-          <div className="hidden md:flex items-center gap-3">
-            <a href="#contact">
-              <Button data-testid="button-header-cta">
-                Оставить заявку
-                <ChevronRight className="ml-1 h-4 w-4" />
-              </Button>
-            </a>
-          </div>
-          <button className="md:hidden p-2" onClick={() => setMobileMenuOpen(!mobileMenuOpen)} data-testid="button-mobile-nav">
-            <div className="space-y-1.5">
-              <span className={`block w-6 h-0.5 bg-foreground transition-all ${mobileMenuOpen ? 'rotate-45 translate-y-2' : ''}`} />
-              <span className={`block w-6 h-0.5 bg-foreground transition-all ${mobileMenuOpen ? 'opacity-0' : ''}`} />
-              <span className={`block w-6 h-0.5 bg-foreground transition-all ${mobileMenuOpen ? '-rotate-45 -translate-y-2' : ''}`} />
-            </div>
-          </button>
-        </div>
-        {mobileMenuOpen && (
-          <div className="md:hidden border-t py-4 space-y-3">
-            <a href="#products" className="block py-2 text-sm font-medium text-muted-foreground" onClick={() => setMobileMenuOpen(false)}>Продукция</a>
-            <a href="#contact" className="block py-2 text-sm font-medium text-muted-foreground" onClick={() => setMobileMenuOpen(false)}>Контакты</a>
-            <a href="/admin/login" className="block py-2 text-sm font-medium text-muted-foreground">Админ</a>
-            <a href="#contact">
-              <Button className="w-full mt-2" onClick={() => setMobileMenuOpen(false)}>Оставить заявку</Button>
-            </a>
-          </div>
-        )}
-      </div>
-    </header>
-  );
-}
-
-function Footer() {
-  return (
-    <footer className="bg-card border-t py-12">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-md bg-primary flex items-center justify-center">
-              <Trees className="h-4 w-4 text-primary-foreground" />
-            </div>
-            <span className="font-bold text-lg">ВУДИНИ</span>
-          </div>
-          <p className="text-sm text-muted-foreground">
-            {new Date().getFullYear()} ВУДИНИ. Все права защищены.
-          </p>
-        </div>
-      </div>
-    </footer>
-  );
-}
-
+// ─── Static sections ──────────────────────────────────────────────────────────
 function StatsBar() {
   const stats = [
     { value: "10+", label: "лет на рынке" },
@@ -528,7 +487,6 @@ function StatsBar() {
     { value: "2M+", label: "изделий в год" },
     { value: "24ч", label: "ответ на заявку" },
   ];
-
   return (
     <section className="py-12 bg-primary">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -545,19 +503,110 @@ function StatsBar() {
   );
 }
 
+function Header() {
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  return (
+    <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-16">
+          <a href="/" className="flex items-center gap-2.5" data-testid="link-logo">
+            <img src="/logo.png" alt="ВУДИНИ" className="h-10 w-auto object-contain" onError={(e) => {
+              (e.target as HTMLImageElement).style.display = "none";
+            }} />
+          </a>
+          <nav className="hidden md:flex items-center gap-8">
+            <a href="#products" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors" data-testid="link-nav-products">Продукция</a>
+            <a href="#contact" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors" data-testid="link-nav-contact">Контакты</a>
+          </nav>
+          <div className="hidden md:flex items-center gap-3">
+            <a href="#contact">
+              <Button data-testid="button-header-cta">Оставить заявку<ChevronRight className="ml-1 h-4 w-4" /></Button>
+            </a>
+          </div>
+          <button className="md:hidden p-2" onClick={() => setMobileMenuOpen(!mobileMenuOpen)} data-testid="button-mobile-nav">
+            <div className="space-y-1.5">
+              <span className={`block w-6 h-0.5 bg-foreground transition-all ${mobileMenuOpen ? 'rotate-45 translate-y-2' : ''}`} />
+              <span className={`block w-6 h-0.5 bg-foreground transition-all ${mobileMenuOpen ? 'opacity-0' : ''}`} />
+              <span className={`block w-6 h-0.5 bg-foreground transition-all ${mobileMenuOpen ? '-rotate-45 -translate-y-2' : ''}`} />
+            </div>
+          </button>
+        </div>
+        {mobileMenuOpen && (
+          <div className="md:hidden border-t py-4 space-y-3">
+            <a href="#products" className="block py-2 text-sm font-medium text-muted-foreground" onClick={() => setMobileMenuOpen(false)}>Продукция</a>
+            <a href="#contact" className="block py-2 text-sm font-medium text-muted-foreground" onClick={() => setMobileMenuOpen(false)}>Контакты</a>
+            <a href="#contact"><Button className="w-full mt-2" onClick={() => setMobileMenuOpen(false)}>Оставить заявку</Button></a>
+          </div>
+        )}
+      </div>
+    </header>
+  );
+}
+
+function Footer() {
+  return (
+    <footer className="bg-card border-t py-12">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="flex items-center gap-2.5">
+            <img src="/logo.png" alt="ВУДИНИ" className="h-8 w-auto object-contain" onError={(e) => {
+              (e.target as HTMLImageElement).style.display = "none";
+            }} />
+          </div>
+          <p className="text-sm text-muted-foreground">{new Date().getFullYear()} ВУДИНИ. Все права защищены.</p>
+        </div>
+      </div>
+    </footer>
+  );
+}
+
+// ─── Block renderer ───────────────────────────────────────────────────────────
+function renderBlock(block: Block) {
+  const data = parseData(block.data);
+  switch (block.type) {
+    case "hero":      return <HeroSection key={block.id} data={data} />;
+    case "clients":   return <ClientsSection key={block.id} data={data} />;
+    case "features":  return <FeaturesSection key={block.id} data={data} />;
+    case "products":  return <ProductsSection key={block.id} data={data} />;
+    case "portfolio": return <PortfolioSection key={block.id} data={data} />;
+    case "process":   return <ProcessSection key={block.id} data={data} />;
+    case "contacts":  return <ContactSection key={block.id} data={data} />;
+    default:          return null;
+  }
+}
+
+// ─── Main Landing Page ────────────────────────────────────────────────────────
 export default function Landing() {
+  const { data: blocks, isLoading } = useQuery<Block[]>({
+    queryKey: ["/api/blocks"],
+  });
+
+  const sorted = [...(blocks || [])].sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+  const active = sorted.filter(b => b.isActive);
+
+  const heroBlock = active.find(b => b.type === "hero");
+  const afterHeroBlocks = active.filter(b => b.type !== "hero");
+
   return (
     <div className="min-h-screen">
       <Header />
-      <main>
-        <HeroSection />
-        <StatsBar />
-        <AdvantagesSection />
-        <ProductsSection />
-        <ReviewsSection />
-        <PartnersSection />
-        <NewsSection />
-        <ContactSection />
+      <main className="pt-16">
+        {isLoading ? (
+          <div className="min-h-screen flex items-center justify-center">
+            <div className="flex flex-col items-center gap-3 text-muted-foreground">
+              <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+              <p className="text-sm">Загрузка...</p>
+            </div>
+          </div>
+        ) : (
+          <>
+            {heroBlock && renderBlock(heroBlock)}
+            <StatsBar />
+            {afterHeroBlocks.map(block => renderBlock(block))}
+            <ReviewsSection />
+            <NewsSection />
+          </>
+        )}
       </main>
       <Footer />
     </div>

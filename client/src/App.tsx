@@ -18,6 +18,9 @@ import AdminSEO from "@/pages/admin-seo";
 import AdminStats from "@/pages/admin-stats";
 import AdminSiteEditor from "@/pages/admin-site-editor";
 import AdminMedia from "@/pages/admin-media";
+import AdminBlocks from "@/pages/admin-blocks";
+import AdminPortfolio from "@/pages/admin-portfolio";
+import LandingPage from "@/pages/landing";
 
 function AdminPage({ children }: { children: React.ReactNode }) {
   return <AdminLayout>{children}</AdminLayout>;
@@ -26,12 +29,19 @@ function AdminPage({ children }: { children: React.ReactNode }) {
 function Router() {
   return (
     <Switch>
+      <Route path="/" component={LandingPage} />
       <Route path="/admin/login" component={AdminLogin} />
       <Route path="/admin">
         <AdminPage><AdminDashboard /></AdminPage>
       </Route>
       <Route path="/admin/inquiries">
         <AdminPage><AdminInquiries /></AdminPage>
+      </Route>
+      <Route path="/admin/blocks">
+        <AdminPage><AdminBlocks /></AdminPage>
+      </Route>
+      <Route path="/admin/portfolio">
+        <AdminPage><AdminPortfolio /></AdminPage>
       </Route>
       <Route path="/admin/products">
         <AdminPage><AdminProducts /></AdminPage>
