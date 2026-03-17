@@ -60,14 +60,10 @@ export async function registerRoutes(
   httpServer: Server,
   app: Express
 ): Promise<Server> {
-  const servePath = await import("path");
-  const expressStatic = await import("express");
-  const clientDir = servePath.resolve(process.cwd(), "client");
-
-  app.use(expressStatic.default.static(clientDir, { index: false }));
+  const clientDir = path.resolve(process.cwd(), "client");
 
   app.get("/", (_req, res) => {
-    res.sendFile(servePath.resolve(clientDir, "landing.html"));
+    res.sendFile(path.resolve(clientDir, "landing.html"));
   });
   const isProduction = process.env.NODE_ENV === "production";
 

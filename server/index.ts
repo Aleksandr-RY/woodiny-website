@@ -71,7 +71,19 @@ app.use((req, res, next) => {
 
 (async () => {
   const clientDir = path.resolve(process.cwd(), "client");
-  app.use(express.static(clientDir, { index: false }));
+
+  const staticMiddleware = express.static(clientDir, { index: false });
+
+  if (process.env.NODE_ENV === "production") {
+    app.use(staticMiddleware);
+  } else {
+    // In dev: skip static for /src/* so Vite handles TS/TSX transpilation.
+    // express.static would serve raw .ts/.tsx with wrong MIME type.
+    app.use((req, res, next) => {
+      if (req.path.startsWith("/src/")) return next();
+      staticMiddleware(req, res, next);
+    });
+  }
 
   await registerRoutes(httpServer, app);
 
