@@ -17,6 +17,8 @@ import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { Plus, Pencil, Trash2, PackageOpen } from "lucide-react";
 import { ImageUpload } from "@/components/image-upload";
+import { MediaPicker } from "@/components/media-picker";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import type { Product } from "@shared/schema";
 
 function ProductForm({ product, onDone }: { product?: Product; onDone: () => void }) {
@@ -65,10 +67,33 @@ function ProductForm({ product, onDone }: { product?: Product; onDone: () => voi
       </div>
       <div>
         <label className="text-sm font-medium mb-1.5 block">Изображение</label>
-        <ImageUpload
-          value={form.imageUrl}
-          onChange={(url) => setForm({ ...form, imageUrl: url })}
-        />
+        {form.imageUrl && (
+          <div className="mb-2 rounded-lg overflow-hidden border h-32 relative bg-muted">
+            <img src={form.imageUrl} alt="Preview" className="w-full h-full object-cover" />
+          </div>
+        )}
+        <Tabs defaultValue="upload">
+          <TabsList className="mb-2">
+            <TabsTrigger value="upload">Загрузить</TabsTrigger>
+            <TabsTrigger value="library">Из библиотеки</TabsTrigger>
+          </TabsList>
+          <TabsContent value="upload">
+            <ImageUpload value={form.imageUrl} onChange={(url) => setForm({ ...form, imageUrl: url })} />
+          </TabsContent>
+          <TabsContent value="library">
+            <div className="flex items-center gap-3">
+              <MediaPicker
+                value={form.imageUrl}
+                onChange={(url) => setForm({ ...form, imageUrl: url })}
+              />
+              {form.imageUrl && (
+                <Button type="button" variant="ghost" size="sm" className="text-muted-foreground" onClick={() => setForm({ ...form, imageUrl: "" })}>
+                  Очистить
+                </Button>
+              )}
+            </div>
+          </TabsContent>
+        </Tabs>
       </div>
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
