@@ -38,8 +38,10 @@ export function ImageUpload({ value, onChange, className }: ImageUploadProps) {
         body: formData,
       });
       if (!res.ok) {
+        if (res.status === 413) throw new Error("Файл слишком большой — увеличьте client_max_body_size в nginx");
+        if (res.status === 401) throw new Error("Сессия истекла — войдите снова");
         const err = await res.json().catch(() => ({}));
-        throw new Error(err.message || "Ошибка загрузки");
+        throw new Error(err.message || `Ошибка сервера (${res.status})`);
       }
       const data = await res.json();
       onChange(data.url);
