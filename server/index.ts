@@ -1,6 +1,7 @@
 import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { serveStatic } from "./static";
+import { runMigrations } from "./db";
 import { createServer } from "http";
 import path from "path";
 
@@ -70,9 +71,8 @@ app.use((req, res, next) => {
 });
 
 (async () => {
-  // In production the bundled server sits in dist/index.cjs, so __dirname = dist/.
-  // path.resolve(__dirname, "../client") always resolves correctly regardless of cwd.
-  // In dev we use process.cwd() because __dirname is the ts source directory.
+  await runMigrations();
+
   const isProduction = process.env.NODE_ENV === "production";
   const clientDir = isProduction
     ? path.resolve(__dirname, "..", "client")
