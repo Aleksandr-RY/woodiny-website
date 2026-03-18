@@ -570,11 +570,15 @@ function PortfolioSection({ data }: { data: any }) {
           {active.length
             ? active.slice(0, 8).map((item, i) => (
               <div key={item.id} className="portfolio-item" data-testid={`portfolio-item-${i + 1}`}>
-                <div className={`portfolio-item-inner${item.imageUrl ? " has-image" : ""}`} style={{ position: "relative" }}>
-                  {item.imageUrl
-                    ? <img src={item.imageUrl} alt={item.title} />
-                    : imageSvg
-                  }
+                <div
+                  className={`portfolio-item-inner${item.imageUrl ? " has-image" : ""}`}
+                  style={item.imageUrl ? {
+                    backgroundImage: `url(${item.imageUrl})`,
+                    backgroundSize: "cover",
+                    backgroundPosition: "center",
+                  } : undefined}
+                >
+                  {!item.imageUrl && imageSvg}
                 </div>
                 <div className="portfolio-overlay"><span>{item.title}</span></div>
               </div>
