@@ -415,20 +415,27 @@ export async function registerRoutes(
   });
 
   app.post("/api/upload", requireAuth, (req, res) => {
+    console.log("[upload] UPLOADS_DIR:", UPLOADS_DIR);
+    console.log("[upload] dir exists:", fs.existsSync(UPLOADS_DIR));
+    console.log("[upload] content-type:", req.headers["content-type"]);
     upload.single("image")(req, res, (err) => {
       if (err instanceof multer.MulterError) {
+        console.error("[upload] MulterError:", err.code, err.message);
         if (err.code === "LIMIT_FILE_SIZE") {
           return res.status(413).json({ message: "Файл слишком большой (макс. 5 МБ)" });
         }
         return res.status(400).json({ message: err.message });
       }
       if (err) {
+        console.error("[upload] error:", err.message);
         return res.status(400).json({ message: err.message || "Ошибка загрузки" });
       }
       if (!req.file) {
+        console.error("[upload] no file received");
         return res.status(400).json({ message: "Файл не получен" });
       }
       const url = `/uploads/${req.file.filename}`;
+      console.log("[upload] success:", url);
       res.json({ url });
     });
   });
