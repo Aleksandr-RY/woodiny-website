@@ -4,6 +4,7 @@ import session from "express-session";
 import createMemoryStore from "memorystore";
 import bcrypt from "bcryptjs";
 import { storage } from "./storage";
+import { sendInquiryEmail } from "./mailer";
 import fs from "fs";
 import path from "path";
 import multer from "multer";
@@ -152,6 +153,9 @@ export async function registerRoutes(
       const data = insertInquirySchema.parse(req.body);
       const item = await storage.createInquiry(data);
       res.json(item);
+      sendInquiryEmail(data).catch((e) =>
+        console.error("[mailer] фоновая ошибка:", e.message)
+      );
     } catch (e: any) {
       res.status(400).json({ message: e.message });
     }
