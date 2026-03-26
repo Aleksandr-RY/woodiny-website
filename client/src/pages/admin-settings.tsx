@@ -3,10 +3,10 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
-import { Save, Phone, Mail, MapPin, Clock, Upload, FileText } from "lucide-react";
+import { Save, Phone, Mail, MapPin, Clock, Upload, FileText, Server } from "lucide-react";
 import { SiTelegram, SiWhatsapp, SiVk, SiInstagram } from "react-icons/si";
 import type { SiteSetting } from "@shared/schema";
 
@@ -58,6 +58,28 @@ export default function AdminSettings() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/settings"] });
       toast({ title: "Контакты сохранены" });
+    },
+  });
+
+  const smtpFields = [
+    { key: "smtp_host", label: "SMTP сервер", placeholder: "smtp.yandex.ru", type: "text" },
+    { key: "smtp_port", label: "Порт", placeholder: "465", type: "text" },
+    { key: "smtp_user", label: "Email (от кого)", placeholder: "info@woodiny.ru", type: "text" },
+    { key: "smtp_pass", label: "Пароль", placeholder: "••••••••", type: "password" },
+    { key: "smtp_to", label: "Получатель (кому)", placeholder: "manager@woodiny.ru", type: "text" },
+  ];
+
+  const saveSmtpMutation = useMutation({
+    mutationFn: async () => {
+      for (const field of smtpFields) {
+        if (values[field.key] !== undefined) {
+          await apiRequest("PUT", `/api/settings/${field.key}`, { value: values[field.key], category: "smtp" });
+        }
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/settings"] });
+      toast({ title: "Настройки почты сохранены" });
     },
   });
 
@@ -127,6 +149,49 @@ export default function AdminSettings() {
               <Button data-testid="button-save-settings" type="submit" disabled={saveMutation.isPending}>
                 <Save className="mr-2 h-4 w-4" />
                 {saveMutation.isPending ? "Сохранение..." : "Сохранить"}
+              </Button>
+            </div>
+          </form>
+        </CardContent>
+      </Card>
+
+      <Card className="mt-6">
+        <CardHeader>
+          <CardTitle className="text-lg">Email уведомления</CardTitle>
+          <CardDescription>
+            Настройки для отправки писем при поступлении новых заявок
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <form
+            onSubmit={(e) => { e.preventDefault(); saveSmtpMutation.mutate(); }}
+            className="space-y-4"
+          >
+            {smtpFields.map((f) => (
+              <div key={f.key} className="flex items-start gap-3">
+                <div className="w-9 h-9 rounded-md bg-muted flex items-center justify-center shrink-0 mt-0.5">
+                  <Server className="h-4 w-4 text-muted-foreground" />
+                </div>
+                <div className="flex-1">
+                  <label className="text-sm font-medium mb-1.5 block">{f.label}</label>
+                  <Input
+                    type={f.type}
+                    placeholder={f.placeholder}
+                    value={values[f.key] || ""}
+                    onChange={(e) => setValues({ ...values, [f.key]: e.target.value })}
+                    autoComplete={f.type === "password" ? "new-password" : undefined}
+                  />
+                </div>
+              </div>
+            ))}
+            <p className="text-xs text-muted-foreground pt-1">
+              Пример для Яндекс.Почты: сервер <code>smtp.yandex.ru</code>, порт <code>465</code>.
+              Для Gmail: <code>smtp.gmail.com</code>, порт <code>587</code>.
+            </p>
+            <div className="pt-2">
+              <Button type="submit" disabled={saveSmtpMutation.isPending}>
+                <Save className="mr-2 h-4 w-4" />
+                {saveSmtpMutation.isPending ? "Сохранение..." : "Сохранить"}
               </Button>
             </div>
           </form>
