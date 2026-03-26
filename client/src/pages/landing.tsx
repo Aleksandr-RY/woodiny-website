@@ -434,11 +434,133 @@ function ProductsSection({ data }: { data: any }) {
   const desc = data?.desc || "Производим широкий ассортимент изделий из натурального дерева";
 
   const defaultProducts = [
-    { name: "Разделочные доски", sub: "Бук, дуб, берёза", testid: "card-product-boards", svg: <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><rect x="10" y="8" width="36" height="48" rx="4"/><path d="M10 18h36"/><path d="M28 18v38"/><circle cx="22" cy="12" r="2"/></svg> },
-    { name: "Менажницы", sub: "Секционные блюда", testid: "card-product-menazhnitsy", svg: <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="32" cy="32" r="24"/><path d="M32 8v48"/><path d="M8 32h48"/><path d="M14 14l36 36"/></svg> },
-    { name: "Скалки и толкушки", sub: "Классические и фигурные", testid: "card-product-skalki", svg: <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><rect x="8" y="26" width="48" height="12" rx="6"/><path d="M8 32H4"/><path d="M56 32h4"/><circle cx="4" cy="32" r="3"/><circle cx="60" cy="32" r="3"/></svg> },
-    { name: "Изделия для сервировки", sub: "Сырницы, маслёнки, блюда", testid: "card-product-servirovka", svg: <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><ellipse cx="32" cy="36" rx="24" ry="8"/><path d="M8 36c0 8 10.7 14 24 14s24-6 24-14"/><path d="M32 10v12"/><circle cx="32" cy="8" r="3"/></svg> },
-    { name: "Изделия по ТЗ", sub: "Под ваш проект", testid: "card-product-custom", svg: <svg viewBox="0 0 64 64" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M40 20a1 1 0 0 0 0 1.4l2.6 2.6a1 1 0 0 0 1.4 0l6-6a10 10 0 0 1-13 13L22 46a3.5 3.5 0 0 1-5-5l15-15a10 10 0 0 1 13-13l-5 5z"/></svg> },
+    {
+      name: "Разделочные доски", sub: "Бук, дуб, берёза", testid: "card-product-boards",
+      svg: (
+        <svg viewBox="0 0 160 160" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="dp-b1" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stopColor="#DFB478"/><stop offset="100%" stopColor="#9E6E3A"/></linearGradient>
+            <linearGradient id="dp-b2" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stopColor="#F0D498"/><stop offset="100%" stopColor="#C89850"/></linearGradient>
+            <filter id="dp-bs"><feDropShadow dx="0" dy="5" stdDeviation="7" floodColor="#7A4A10" floodOpacity="0.28"/></filter>
+          </defs>
+          <g filter="url(#dp-bs)">
+            <rect x="16" y="34" width="110" height="90" rx="12" fill="url(#dp-b1)"/>
+            <path d="M28 50 Q71 48 120 52" stroke="#7A5020" strokeWidth="1.2" strokeLinecap="round" opacity="0.2"/>
+            <path d="M27 64 Q71 62 121 66" stroke="#7A5020" strokeWidth="1.2" strokeLinecap="round" opacity="0.2"/>
+            <path d="M27 78 Q71 76 121 80" stroke="#7A5020" strokeWidth="1.2" strokeLinecap="round" opacity="0.2"/>
+            <path d="M28 92 Q71 90 120 94" stroke="#7A5020" strokeWidth="1.2" strokeLinecap="round" opacity="0.2"/>
+            <path d="M30 106 Q71 104 118 108" stroke="#7A5020" strokeWidth="1.2" strokeLinecap="round" opacity="0.2"/>
+            <rect x="118" y="61" width="32" height="34" rx="9" fill="url(#dp-b2)"/>
+            <circle cx="134" cy="78" r="7" fill="rgba(50,25,5,0.22)"/>
+            <rect x="16" y="34" width="110" height="90" rx="12" stroke="rgba(230,185,110,0.3)" strokeWidth="1.5" fill="none"/>
+            <rect x="118" y="61" width="32" height="34" rx="9" stroke="rgba(230,185,110,0.3)" strokeWidth="1" fill="none"/>
+            <rect x="16" y="34" width="110" height="12" rx="12" fill="rgba(255,240,190,0.14)"/>
+          </g>
+        </svg>
+      ),
+    },
+    {
+      name: "Менажницы", sub: "Секционные блюда", testid: "card-product-menazhnitsy",
+      svg: (
+        <svg viewBox="0 0 160 160" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="dp-m1" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stopColor="#DDB06A"/><stop offset="100%" stopColor="#9A6A30"/></linearGradient>
+            <linearGradient id="dp-m2" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stopColor="#C89040"/><stop offset="100%" stopColor="#805020"/></linearGradient>
+            <linearGradient id="dp-m3" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stopColor="#F0D898"/><stop offset="100%" stopColor="#C09040"/></linearGradient>
+            <filter id="dp-ms"><feDropShadow dx="0" dy="6" stdDeviation="8" floodColor="#7A4A10" floodOpacity="0.3"/></filter>
+            <clipPath id="dp-mc"><circle cx="80" cy="88" r="60"/></clipPath>
+          </defs>
+          <g filter="url(#dp-ms)">
+            <circle cx="80" cy="88" r="60" fill="url(#dp-m1)"/>
+            <path d="M80 28 L80 148" stroke="rgba(80,40,8,0.28)" strokeWidth="2.5"/>
+            <path d="M80 88 L21 60" stroke="rgba(80,40,8,0.28)" strokeWidth="2.5"/>
+            <path d="M80 88 L139 60" stroke="rgba(80,40,8,0.28)" strokeWidth="2.5"/>
+            <path d="M80 88 L80 28 A60 60 0 0 1 139 60 Z" fill="url(#dp-m2)" opacity="0.32" clipPath="url(#dp-mc)"/>
+            <path d="M80 88 L21 60 A60 60 0 0 1 80 28 Z" fill="url(#dp-m3)" opacity="0.28" clipPath="url(#dp-mc)"/>
+            <circle cx="80" cy="88" r="60" stroke="rgba(230,185,110,0.38)" strokeWidth="1.5" fill="none"/>
+            <circle cx="80" cy="88" r="53" stroke="rgba(230,185,110,0.18)" strokeWidth="1" fill="none"/>
+            <rect x="58" y="22" width="44" height="16" rx="8" fill="url(#dp-m2)"/>
+            <rect x="58" y="22" width="44" height="16" rx="8" stroke="rgba(230,185,110,0.3)" strokeWidth="1" fill="none"/>
+          </g>
+        </svg>
+      ),
+    },
+    {
+      name: "Скалки и толкушки", sub: "Классические и фигурные", testid: "card-product-skalki",
+      svg: (
+        <svg viewBox="0 0 160 160" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="dp-r1" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#F0D898"/><stop offset="28%" stopColor="#D4A860"/><stop offset="72%" stopColor="#B07A2A"/><stop offset="100%" stopColor="#8A5820"/></linearGradient>
+            <linearGradient id="dp-r2" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#E0BA70"/><stop offset="100%" stopColor="#986420"/></linearGradient>
+            <filter id="dp-rs"><feDropShadow dx="0" dy="5" stdDeviation="7" floodColor="#7A4A10" floodOpacity="0.26"/></filter>
+          </defs>
+          <g filter="url(#dp-rs)" transform="rotate(-18 80 80)">
+            <rect x="14" y="71" width="26" height="18" rx="9" fill="url(#dp-r2)"/>
+            <rect x="120" y="71" width="26" height="18" rx="9" fill="url(#dp-r2)"/>
+            <rect x="36" y="63" width="88" height="34" rx="17" fill="url(#dp-r1)"/>
+            <line x1="60" y1="66" x2="60" y2="94" stroke="rgba(80,40,5,0.14)" strokeWidth="2"/>
+            <line x1="76" y1="64" x2="76" y2="96" stroke="rgba(80,40,5,0.14)" strokeWidth="2"/>
+            <line x1="92" y1="64" x2="92" y2="96" stroke="rgba(80,40,5,0.14)" strokeWidth="2"/>
+            <line x1="108" y1="66" x2="108" y2="94" stroke="rgba(80,40,5,0.14)" strokeWidth="2"/>
+            <rect x="36" y="63" width="88" height="11" rx="11" fill="rgba(255,240,190,0.18)"/>
+            <rect x="36" y="63" width="88" height="34" rx="17" stroke="rgba(230,185,110,0.32)" strokeWidth="1.5" fill="none"/>
+            <rect x="14" y="71" width="26" height="18" rx="9" stroke="rgba(230,185,110,0.28)" strokeWidth="1" fill="none"/>
+            <rect x="120" y="71" width="26" height="18" rx="9" stroke="rgba(230,185,110,0.28)" strokeWidth="1" fill="none"/>
+          </g>
+        </svg>
+      ),
+    },
+    {
+      name: "Изделия для сервировки", sub: "Сырницы, маслёнки, блюда", testid: "card-product-servirovka",
+      svg: (
+        <svg viewBox="0 0 160 160" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="dp-t1" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stopColor="#DFB478"/><stop offset="100%" stopColor="#9A6830"/></linearGradient>
+            <linearGradient id="dp-t2" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stopColor="#F2DA9A"/><stop offset="100%" stopColor="#C89048"/></linearGradient>
+            <filter id="dp-ts"><feDropShadow dx="0" dy="6" stdDeviation="8" floodColor="#7A4A10" floodOpacity="0.26"/></filter>
+          </defs>
+          <g filter="url(#dp-ts)">
+            <rect x="18" y="96" width="124" height="26" rx="10" fill="url(#dp-t1)"/>
+            <rect x="24" y="100" width="112" height="18" rx="7" fill="url(#dp-t2)" opacity="0.7"/>
+            <path d="M18 106 Q10 109 18 116" stroke="rgba(160,100,40,0.9)" strokeWidth="5" strokeLinecap="round" fill="none"/>
+            <path d="M142 106 Q150 109 142 116" stroke="rgba(160,100,40,0.9)" strokeWidth="5" strokeLinecap="round" fill="none"/>
+            <path d="M42 96 Q46 58 80 50 Q114 58 118 96" fill="url(#dp-t1)"/>
+            <path d="M50 96 Q53 64 80 58 Q107 64 110 96" fill="url(#dp-t2)" opacity="0.55"/>
+            <ellipse cx="80" cy="96" rx="62" ry="10" fill="url(#dp-t1)"/>
+            <ellipse cx="80" cy="96" rx="62" ry="10" stroke="rgba(230,185,110,0.35)" strokeWidth="1.5" fill="none"/>
+            <path d="M42 96 Q46 58 80 50 Q114 58 118 96" stroke="rgba(230,185,110,0.3)" strokeWidth="1.5" fill="none"/>
+            <path d="M46 82 Q80 74 114 82" stroke="#7A5020" strokeWidth="1" opacity="0.18"/>
+            <path d="M42 90 Q80 82 118 90" stroke="#7A5020" strokeWidth="1" opacity="0.18"/>
+            <circle cx="80" cy="50" r="6" fill="url(#dp-t2)"/>
+            <circle cx="80" cy="50" r="6" stroke="rgba(230,185,110,0.35)" strokeWidth="1" fill="none"/>
+          </g>
+        </svg>
+      ),
+    },
+    {
+      name: "Изделия по ТЗ", sub: "Под ваш проект", testid: "card-product-custom",
+      svg: (
+        <svg viewBox="0 0 160 160" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="dp-c1" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stopColor="#DFB478"/><stop offset="100%" stopColor="#9E6E3A"/></linearGradient>
+            <linearGradient id="dp-c2" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stopColor="#F0D498"/><stop offset="100%" stopColor="#C09040"/></linearGradient>
+            <filter id="dp-cs"><feDropShadow dx="0" dy="5" stdDeviation="7" floodColor="#7A4A10" floodOpacity="0.26"/></filter>
+          </defs>
+          <g filter="url(#dp-cs)">
+            <rect x="62" y="20" width="8" height="110" rx="4" fill="url(#dp-c1)" transform="rotate(-30 80 80)"/>
+            <polygon points="58,22 70,22 66,36 62,36" fill="url(#dp-c2)" transform="rotate(-30 80 80)"/>
+            <rect x="92" y="30" width="6" height="90" rx="3" fill="url(#dp-c1)" transform="rotate(18 80 80)"/>
+            <line x1="102" y1="42" x2="96" y2="100" stroke="rgba(230,185,110,0.4)" strokeWidth="1" transform="rotate(18 80 80)"/>
+            <line x1="96" y1="58" x2="102" y2="58" stroke="rgba(230,185,110,0.5)" strokeWidth="1.5" strokeLinecap="round" transform="rotate(18 80 80)"/>
+            <line x1="96" y1="68" x2="102" y2="68" stroke="rgba(230,185,110,0.5)" strokeWidth="1.5" strokeLinecap="round" transform="rotate(18 80 80)"/>
+            <line x1="96" y1="78" x2="102" y2="78" stroke="rgba(230,185,110,0.5)" strokeWidth="1.5" strokeLinecap="round" transform="rotate(18 80 80)"/>
+            <circle cx="80" cy="80" r="22" fill="url(#dp-c2)" opacity="0.28"/>
+            <circle cx="80" cy="80" r="22" stroke="rgba(230,185,110,0.45)" strokeWidth="1.5" fill="none"/>
+            <circle cx="80" cy="80" r="5" fill="url(#dp-c1)"/>
+          </g>
+        </svg>
+      ),
+    },
   ];
 
   const displayProducts = active.length ? active.slice(0, 5) : null;
