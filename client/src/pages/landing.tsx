@@ -439,22 +439,31 @@ function ProductsSection({ data }: { data: any }) {
       svg: (
         <svg viewBox="0 0 160 160" fill="none" xmlns="http://www.w3.org/2000/svg">
           <defs>
-            <linearGradient id="dp-b1" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stopColor="#DFB478"/><stop offset="100%" stopColor="#9E6E3A"/></linearGradient>
-            <linearGradient id="dp-b2" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stopColor="#F0D498"/><stop offset="100%" stopColor="#C89850"/></linearGradient>
-            <filter id="dp-bs"><feDropShadow dx="0" dy="5" stdDeviation="7" floodColor="#7A4A10" floodOpacity="0.28"/></filter>
+            <linearGradient id="dp-b1" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stopColor="#EEC47A"/><stop offset="50%" stopColor="#C8903C"/><stop offset="100%" stopColor="#9A6428"/></linearGradient>
+            <linearGradient id="dp-b2" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stopColor="#F8E4A8"/><stop offset="100%" stopColor="#DEB85C"/></linearGradient>
+            <linearGradient id="dp-bh" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="rgba(255,248,210,0.45)"/><stop offset="100%" stopColor="rgba(255,248,210,0)"/></linearGradient>
+            <filter id="dp-bs"><feDropShadow dx="2" dy="8" stdDeviation="8" floodColor="#7A4A10" floodOpacity="0.32"/></filter>
           </defs>
           <g filter="url(#dp-bs)">
-            <rect x="16" y="34" width="110" height="90" rx="12" fill="url(#dp-b1)"/>
-            <path d="M28 50 Q71 48 120 52" stroke="#7A5020" strokeWidth="1.2" strokeLinecap="round" opacity="0.2"/>
-            <path d="M27 64 Q71 62 121 66" stroke="#7A5020" strokeWidth="1.2" strokeLinecap="round" opacity="0.2"/>
-            <path d="M27 78 Q71 76 121 80" stroke="#7A5020" strokeWidth="1.2" strokeLinecap="round" opacity="0.2"/>
-            <path d="M28 92 Q71 90 120 94" stroke="#7A5020" strokeWidth="1.2" strokeLinecap="round" opacity="0.2"/>
-            <path d="M30 106 Q71 104 118 108" stroke="#7A5020" strokeWidth="1.2" strokeLinecap="round" opacity="0.2"/>
-            <rect x="118" y="61" width="32" height="34" rx="9" fill="url(#dp-b2)"/>
-            <circle cx="134" cy="78" r="7" fill="rgba(50,25,5,0.22)"/>
-            <rect x="16" y="34" width="110" height="90" rx="12" stroke="rgba(230,185,110,0.3)" strokeWidth="1.5" fill="none"/>
-            <rect x="118" y="61" width="32" height="34" rx="9" stroke="rgba(230,185,110,0.3)" strokeWidth="1" fill="none"/>
-            <rect x="16" y="34" width="110" height="12" rx="12" fill="rgba(255,240,190,0.14)"/>
+            {/* Основная доска */}
+            <rect x="14" y="30" width="116" height="96" rx="14" fill="url(#dp-b1)"/>
+            {/* Волокна дерева — органические кривые */}
+            <path d="M26 47 C50 44 80 45 124 49" stroke="#7A4A10" strokeWidth="1.4" strokeLinecap="round" opacity="0.18"/>
+            <path d="M24 60 C48 57 82 58 126 62" stroke="#7A4A10" strokeWidth="1.4" strokeLinecap="round" opacity="0.18"/>
+            <path d="M24 73 C46 70 80 71 126 75" stroke="#7A4A10" strokeWidth="1.4" strokeLinecap="round" opacity="0.18"/>
+            <path d="M25 86 C47 83 80 84 125 88" stroke="#7A4A10" strokeWidth="1.4" strokeLinecap="round" opacity="0.18"/>
+            <path d="M26 99 C48 96 80 97 124 101" stroke="#7A4A10" strokeWidth="1.4" strokeLinecap="round" opacity="0.18"/>
+            <path d="M28 112 C50 109 80 110 122 114" stroke="#7A4A10" strokeWidth="1.4" strokeLinecap="round" opacity="0.18"/>
+            {/* Ручка */}
+            <rect x="122" y="55" width="26" height="46" rx="13" fill="url(#dp-b2)"/>
+            {/* Отверстие в ручке */}
+            <circle cx="135" cy="78" r="8" fill="rgba(30,15,3,0.28)"/>
+            <circle cx="135" cy="78" r="5" fill="rgba(15,8,2,0.22)"/>
+            {/* Бортик доски */}
+            <rect x="14" y="30" width="116" height="96" rx="14" stroke="rgba(245,200,120,0.38)" strokeWidth="2" fill="none"/>
+            <rect x="122" y="55" width="26" height="46" rx="13" stroke="rgba(245,200,120,0.32)" strokeWidth="1.5" fill="none"/>
+            {/* Световой блик */}
+            <rect x="14" y="30" width="116" height="18" rx="14" fill="url(#dp-bh)"/>
           </g>
         </svg>
       ),
@@ -464,23 +473,35 @@ function ProductsSection({ data }: { data: any }) {
       svg: (
         <svg viewBox="0 0 160 160" fill="none" xmlns="http://www.w3.org/2000/svg">
           <defs>
-            <linearGradient id="dp-m1" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stopColor="#DDB06A"/><stop offset="100%" stopColor="#9A6A30"/></linearGradient>
-            <linearGradient id="dp-m2" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stopColor="#C89040"/><stop offset="100%" stopColor="#805020"/></linearGradient>
-            <linearGradient id="dp-m3" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stopColor="#F0D898"/><stop offset="100%" stopColor="#C09040"/></linearGradient>
-            <filter id="dp-ms"><feDropShadow dx="0" dy="6" stdDeviation="8" floodColor="#7A4A10" floodOpacity="0.3"/></filter>
-            <clipPath id="dp-mc"><circle cx="80" cy="88" r="60"/></clipPath>
+            <radialGradient id="dp-m1" cx="38%" cy="35%" r="65%"><stop offset="0%" stopColor="#F2D890"/><stop offset="55%" stopColor="#CFA050"/><stop offset="100%" stopColor="#9A6828"/></radialGradient>
+            <radialGradient id="dp-m2" cx="40%" cy="35%" r="65%"><stop offset="0%" stopColor="#F8E8B0"/><stop offset="100%" stopColor="#C48C30"/></radialGradient>
+            <radialGradient id="dp-m3" cx="40%" cy="35%" r="65%"><stop offset="0%" stopColor="#EAD080"/><stop offset="100%" stopColor="#A87420"/></radialGradient>
+            <filter id="dp-ms"><feDropShadow dx="2" dy="8" stdDeviation="8" floodColor="#7A4A10" floodOpacity="0.32"/></filter>
+            <clipPath id="dp-mc"><circle cx="80" cy="86" r="58"/></clipPath>
           </defs>
           <g filter="url(#dp-ms)">
-            <circle cx="80" cy="88" r="60" fill="url(#dp-m1)"/>
-            <path d="M80 28 L80 148" stroke="rgba(80,40,8,0.28)" strokeWidth="2.5"/>
-            <path d="M80 88 L21 60" stroke="rgba(80,40,8,0.28)" strokeWidth="2.5"/>
-            <path d="M80 88 L139 60" stroke="rgba(80,40,8,0.28)" strokeWidth="2.5"/>
-            <path d="M80 88 L80 28 A60 60 0 0 1 139 60 Z" fill="url(#dp-m2)" opacity="0.32" clipPath="url(#dp-mc)"/>
-            <path d="M80 88 L21 60 A60 60 0 0 1 80 28 Z" fill="url(#dp-m3)" opacity="0.28" clipPath="url(#dp-mc)"/>
-            <circle cx="80" cy="88" r="60" stroke="rgba(230,185,110,0.38)" strokeWidth="1.5" fill="none"/>
-            <circle cx="80" cy="88" r="53" stroke="rgba(230,185,110,0.18)" strokeWidth="1" fill="none"/>
-            <rect x="58" y="22" width="44" height="16" rx="8" fill="url(#dp-m2)"/>
-            <rect x="58" y="22" width="44" height="16" rx="8" stroke="rgba(230,185,110,0.3)" strokeWidth="1" fill="none"/>
+            {/* Тень внизу */}
+            <ellipse cx="82" cy="148" rx="46" ry="7" fill="rgba(100,55,10,0.2)"/>
+            {/* Основной круг */}
+            <circle cx="80" cy="86" r="58" fill="url(#dp-m1)"/>
+            {/* Три секции с разными оттенками */}
+            <path d="M80 86 L80 28 A58 58 0 0 1 130.2 115 Z" fill="url(#dp-m2)" clipPath="url(#dp-mc)" opacity="0.55"/>
+            <path d="M80 86 L130.2 115 A58 58 0 0 1 29.8 115 Z" fill="url(#dp-m3)" clipPath="url(#dp-mc)" opacity="0.45"/>
+            {/* Разделители секций */}
+            <line x1="80" y1="86" x2="80" y2="28" stroke="rgba(60,30,5,0.35)" strokeWidth="2.5" strokeLinecap="round"/>
+            <line x1="80" y1="86" x2="130.2" y2="115" stroke="rgba(60,30,5,0.35)" strokeWidth="2.5" strokeLinecap="round"/>
+            <line x1="80" y1="86" x2="29.8" y2="115" stroke="rgba(60,30,5,0.35)" strokeWidth="2.5" strokeLinecap="round"/>
+            {/* Внешний обод */}
+            <circle cx="80" cy="86" r="58" stroke="rgba(245,200,110,0.42)" strokeWidth="2" fill="none"/>
+            <circle cx="80" cy="86" r="52" stroke="rgba(245,200,110,0.18)" strokeWidth="1" fill="none"/>
+            {/* Центр */}
+            <circle cx="80" cy="86" r="6" fill="url(#dp-m2)"/>
+            <circle cx="80" cy="86" r="6" stroke="rgba(60,30,5,0.2)" strokeWidth="1" fill="none"/>
+            {/* Ручка */}
+            <rect x="58" y="20" width="44" height="15" rx="7.5" fill="url(#dp-m2)"/>
+            <rect x="58" y="20" width="44" height="15" rx="7.5" stroke="rgba(245,200,110,0.38)" strokeWidth="1.5" fill="none"/>
+            {/* Блик */}
+            <path d="M42 60 Q80 50 118 60" stroke="rgba(255,248,200,0.55)" strokeWidth="4" strokeLinecap="round"/>
           </g>
         </svg>
       ),
@@ -490,22 +511,35 @@ function ProductsSection({ data }: { data: any }) {
       svg: (
         <svg viewBox="0 0 160 160" fill="none" xmlns="http://www.w3.org/2000/svg">
           <defs>
-            <linearGradient id="dp-r1" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#F0D898"/><stop offset="28%" stopColor="#D4A860"/><stop offset="72%" stopColor="#B07A2A"/><stop offset="100%" stopColor="#8A5820"/></linearGradient>
-            <linearGradient id="dp-r2" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#E0BA70"/><stop offset="100%" stopColor="#986420"/></linearGradient>
-            <filter id="dp-rs"><feDropShadow dx="0" dy="5" stdDeviation="7" floodColor="#7A4A10" floodOpacity="0.26"/></filter>
+            <linearGradient id="dp-r1" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="#F8E8B0"/>
+              <stop offset="18%" stopColor="#E8C468"/>
+              <stop offset="50%" stopColor="#C08830"/>
+              <stop offset="82%" stopColor="#9A6418"/>
+              <stop offset="100%" stopColor="#7A4C10"/>
+            </linearGradient>
+            <linearGradient id="dp-r2" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#F0D888"/><stop offset="100%" stopColor="#A87020"/></linearGradient>
+            <linearGradient id="dp-rh" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="rgba(255,248,200,0.5)"/><stop offset="40%" stopColor="rgba(255,248,200,0)"/></linearGradient>
+            <filter id="dp-rs"><feDropShadow dx="2" dy="8" stdDeviation="8" floodColor="#7A4A10" floodOpacity="0.32"/></filter>
           </defs>
-          <g filter="url(#dp-rs)" transform="rotate(-18 80 80)">
-            <rect x="14" y="71" width="26" height="18" rx="9" fill="url(#dp-r2)"/>
-            <rect x="120" y="71" width="26" height="18" rx="9" fill="url(#dp-r2)"/>
-            <rect x="36" y="63" width="88" height="34" rx="17" fill="url(#dp-r1)"/>
-            <line x1="60" y1="66" x2="60" y2="94" stroke="rgba(80,40,5,0.14)" strokeWidth="2"/>
-            <line x1="76" y1="64" x2="76" y2="96" stroke="rgba(80,40,5,0.14)" strokeWidth="2"/>
-            <line x1="92" y1="64" x2="92" y2="96" stroke="rgba(80,40,5,0.14)" strokeWidth="2"/>
-            <line x1="108" y1="66" x2="108" y2="94" stroke="rgba(80,40,5,0.14)" strokeWidth="2"/>
-            <rect x="36" y="63" width="88" height="11" rx="11" fill="rgba(255,240,190,0.18)"/>
-            <rect x="36" y="63" width="88" height="34" rx="17" stroke="rgba(230,185,110,0.32)" strokeWidth="1.5" fill="none"/>
-            <rect x="14" y="71" width="26" height="18" rx="9" stroke="rgba(230,185,110,0.28)" strokeWidth="1" fill="none"/>
-            <rect x="120" y="71" width="26" height="18" rx="9" stroke="rgba(230,185,110,0.28)" strokeWidth="1" fill="none"/>
+          <g filter="url(#dp-rs)" transform="rotate(-20 80 80)">
+            {/* Левая ручка */}
+            <rect x="10" y="68" width="30" height="24" rx="12" fill="url(#dp-r2)"/>
+            <rect x="10" y="68" width="30" height="24" rx="12" stroke="rgba(245,200,110,0.3)" strokeWidth="1.5" fill="none"/>
+            {/* Правая ручка */}
+            <rect x="120" y="68" width="30" height="24" rx="12" fill="url(#dp-r2)"/>
+            <rect x="120" y="68" width="30" height="24" rx="12" stroke="rgba(245,200,110,0.3)" strokeWidth="1.5" fill="none"/>
+            {/* Вал скалки */}
+            <rect x="36" y="60" width="88" height="40" rx="20" fill="url(#dp-r1)"/>
+            {/* Вертикальные кольца текстуры */}
+            <line x1="56" y1="63" x2="56" y2="97" stroke="rgba(60,30,5,0.13)" strokeWidth="2.5" strokeLinecap="round"/>
+            <line x1="72" y1="61" x2="72" y2="99" stroke="rgba(60,30,5,0.13)" strokeWidth="2.5" strokeLinecap="round"/>
+            <line x1="88" y1="61" x2="88" y2="99" stroke="rgba(60,30,5,0.13)" strokeWidth="2.5" strokeLinecap="round"/>
+            <line x1="104" y1="63" x2="104" y2="97" stroke="rgba(60,30,5,0.13)" strokeWidth="2.5" strokeLinecap="round"/>
+            {/* Обводка вала */}
+            <rect x="36" y="60" width="88" height="40" rx="20" stroke="rgba(245,200,110,0.35)" strokeWidth="2" fill="none"/>
+            {/* Световой блик */}
+            <rect x="36" y="60" width="88" height="16" rx="14" fill="url(#dp-rh)"/>
           </g>
         </svg>
       ),
