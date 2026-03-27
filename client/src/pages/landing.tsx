@@ -517,22 +517,29 @@ function ProductsSection({ data }: { data: any }) {
           <defs>
             <linearGradient id="dp-t1" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stopColor="#DFB478"/><stop offset="100%" stopColor="#9A6830"/></linearGradient>
             <linearGradient id="dp-t2" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stopColor="#F2DA9A"/><stop offset="100%" stopColor="#C89048"/></linearGradient>
-            <filter id="dp-ts"><feDropShadow dx="0" dy="6" stdDeviation="8" floodColor="#7A4A10" floodOpacity="0.26"/></filter>
+            <linearGradient id="dp-t3" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stopColor="#EED090"/><stop offset="100%" stopColor="#B07830"/></linearGradient>
+            <filter id="dp-ts"><feDropShadow dx="0" dy="6" stdDeviation="7" floodColor="#7A4A10" floodOpacity="0.26"/></filter>
           </defs>
           <g filter="url(#dp-ts)">
-            <rect x="18" y="96" width="124" height="26" rx="10" fill="url(#dp-t1)"/>
-            <rect x="24" y="100" width="112" height="18" rx="7" fill="url(#dp-t2)" opacity="0.7"/>
-            <path d="M18 106 Q10 109 18 116" stroke="rgba(160,100,40,0.9)" strokeWidth="5" strokeLinecap="round" fill="none"/>
-            <path d="M142 106 Q150 109 142 116" stroke="rgba(160,100,40,0.9)" strokeWidth="5" strokeLinecap="round" fill="none"/>
-            <path d="M42 96 Q46 58 80 50 Q114 58 118 96" fill="url(#dp-t1)"/>
-            <path d="M50 96 Q53 64 80 58 Q107 64 110 96" fill="url(#dp-t2)" opacity="0.55"/>
-            <ellipse cx="80" cy="96" rx="62" ry="10" fill="url(#dp-t1)"/>
-            <ellipse cx="80" cy="96" rx="62" ry="10" stroke="rgba(230,185,110,0.35)" strokeWidth="1.5" fill="none"/>
-            <path d="M42 96 Q46 58 80 50 Q114 58 118 96" stroke="rgba(230,185,110,0.3)" strokeWidth="1.5" fill="none"/>
-            <path d="M46 82 Q80 74 114 82" stroke="#7A5020" strokeWidth="1" opacity="0.18"/>
-            <path d="M42 90 Q80 82 118 90" stroke="#7A5020" strokeWidth="1" opacity="0.18"/>
-            <circle cx="80" cy="50" r="6" fill="url(#dp-t2)"/>
-            <circle cx="80" cy="50" r="6" stroke="rgba(230,185,110,0.35)" strokeWidth="1" fill="none"/>
+            {/* Поднос-основа */}
+            <rect x="16" y="104" width="128" height="22" rx="8" fill="url(#dp-t1)"/>
+            <rect x="22" y="108" width="116" height="14" rx="5" fill="url(#dp-t2)" opacity="0.6"/>
+            <path d="M26 110 Q80 108 134 110" stroke="#7A5020" strokeWidth="1" opacity="0.2" strokeLinecap="round"/>
+            <path d="M24 116 Q80 114 136 116" stroke="#7A5020" strokeWidth="1" opacity="0.2" strokeLinecap="round"/>
+            {/* Маслёнка — прямоугольный ящичек с крышкой */}
+            <rect x="22" y="74" width="52" height="32" rx="5" fill="url(#dp-t1)"/>
+            <rect x="26" y="78" width="44" height="24" rx="3" fill="url(#dp-t2)" opacity="0.6"/>
+            <rect x="22" y="68" width="52" height="10" rx="4" fill="url(#dp-t3)"/>
+            <rect x="42" y="62" width="12" height="8" rx="3" fill="url(#dp-t1)"/>
+            <rect x="22" y="74" width="52" height="32" rx="5" stroke="rgba(230,185,110,0.3)" strokeWidth="1" fill="none"/>
+            {/* Сырница — закруглённая коробочка */}
+            <rect x="86" y="76" width="54" height="30" rx="5" fill="url(#dp-t3)"/>
+            <path d="M86 86 Q113 78 140 86" fill="url(#dp-t1)"/>
+            <path d="M86 86 Q113 78 140 86" stroke="rgba(230,185,110,0.3)" strokeWidth="1" fill="none"/>
+            <rect x="104" y="70" width="18" height="8" rx="3" fill="url(#dp-t1)"/>
+            <rect x="86" y="76" width="54" height="30" rx="5" stroke="rgba(230,185,110,0.3)" strokeWidth="1" fill="none"/>
+            {/* Блюдце */}
+            <ellipse cx="80" cy="104" rx="62" ry="6" fill="url(#dp-t1)" opacity="0.4"/>
           </g>
         </svg>
       ),
