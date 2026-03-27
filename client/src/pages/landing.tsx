@@ -544,19 +544,24 @@ function ProductsSection({ data }: { data: any }) {
           <defs>
             <linearGradient id="dp-c1" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stopColor="#DFB478"/><stop offset="100%" stopColor="#9E6E3A"/></linearGradient>
             <linearGradient id="dp-c2" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stopColor="#F0D498"/><stop offset="100%" stopColor="#C09040"/></linearGradient>
+            <linearGradient id="dp-c3" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#F4DFA0"/><stop offset="100%" stopColor="#B88030"/></linearGradient>
             <filter id="dp-cs"><feDropShadow dx="0" dy="5" stdDeviation="7" floodColor="#7A4A10" floodOpacity="0.26"/></filter>
           </defs>
           <g filter="url(#dp-cs)">
-            <rect x="62" y="20" width="8" height="110" rx="4" fill="url(#dp-c1)" transform="rotate(-30 80 80)"/>
-            <polygon points="58,22 70,22 66,36 62,36" fill="url(#dp-c2)" transform="rotate(-30 80 80)"/>
-            <rect x="92" y="30" width="6" height="90" rx="3" fill="url(#dp-c1)" transform="rotate(18 80 80)"/>
-            <line x1="102" y1="42" x2="96" y2="100" stroke="rgba(230,185,110,0.4)" strokeWidth="1" transform="rotate(18 80 80)"/>
-            <line x1="96" y1="58" x2="102" y2="58" stroke="rgba(230,185,110,0.5)" strokeWidth="1.5" strokeLinecap="round" transform="rotate(18 80 80)"/>
-            <line x1="96" y1="68" x2="102" y2="68" stroke="rgba(230,185,110,0.5)" strokeWidth="1.5" strokeLinecap="round" transform="rotate(18 80 80)"/>
-            <line x1="96" y1="78" x2="102" y2="78" stroke="rgba(230,185,110,0.5)" strokeWidth="1.5" strokeLinecap="round" transform="rotate(18 80 80)"/>
-            <circle cx="80" cy="80" r="22" fill="url(#dp-c2)" opacity="0.28"/>
-            <circle cx="80" cy="80" r="22" stroke="rgba(230,185,110,0.45)" strokeWidth="1.5" fill="none"/>
-            <circle cx="80" cy="80" r="5" fill="url(#dp-c1)"/>
+            <rect x="30" y="50" width="100" height="60" rx="10" fill="url(#dp-c1)"/>
+            <rect x="38" y="58" width="84" height="44" rx="7" fill="url(#dp-c2)" opacity="0.55"/>
+            <path d="M50 72 Q80 70 110 72" stroke="#7A5020" strokeWidth="1.2" strokeLinecap="round" opacity="0.25"/>
+            <path d="M50 82 Q80 80 110 82" stroke="#7A5020" strokeWidth="1.2" strokeLinecap="round" opacity="0.25"/>
+            <path d="M50 92 Q80 90 110 92" stroke="#7A5020" strokeWidth="1.2" strokeLinecap="round" opacity="0.25"/>
+            <rect x="30" y="50" width="100" height="60" rx="10" stroke="rgba(230,185,110,0.3)" strokeWidth="1.5" fill="none"/>
+            <rect x="56" y="34" width="48" height="22" rx="6" fill="url(#dp-c3)"/>
+            <rect x="56" y="34" width="48" height="22" rx="6" stroke="rgba(230,185,110,0.3)" strokeWidth="1" fill="none"/>
+            <line x1="68" y1="34" x2="68" y2="56" stroke="rgba(100,55,10,0.2)" strokeWidth="1"/>
+            <line x1="80" y1="34" x2="80" y2="56" stroke="rgba(100,55,10,0.2)" strokeWidth="1"/>
+            <line x1="92" y1="34" x2="92" y2="56" stroke="rgba(100,55,10,0.2)" strokeWidth="1"/>
+            <circle cx="80" cy="112" r="8" fill="url(#dp-c3)"/>
+            <line x1="80" y1="110" x2="80" y2="124" stroke="rgba(230,185,110,0.5)" strokeWidth="2" strokeLinecap="round"/>
+            <rect x="30" y="50" width="100" height="10" rx="10" fill="rgba(255,240,190,0.12)"/>
           </g>
         </svg>
       ),
