@@ -515,31 +515,33 @@ function ProductsSection({ data }: { data: any }) {
       svg: (
         <svg viewBox="0 0 160 160" fill="none" xmlns="http://www.w3.org/2000/svg">
           <defs>
-            <linearGradient id="dp-t1" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stopColor="#DFB478"/><stop offset="100%" stopColor="#9A6830"/></linearGradient>
-            <linearGradient id="dp-t2" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stopColor="#F2DA9A"/><stop offset="100%" stopColor="#C89048"/></linearGradient>
-            <linearGradient id="dp-t3" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stopColor="#EED090"/><stop offset="100%" stopColor="#B07830"/></linearGradient>
-            <filter id="dp-ts"><feDropShadow dx="0" dy="6" stdDeviation="7" floodColor="#7A4A10" floodOpacity="0.26"/></filter>
+            <linearGradient id="dp-t1" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stopColor="#E8C07A"/><stop offset="100%" stopColor="#9A6830"/></linearGradient>
+            <linearGradient id="dp-t2" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stopColor="#F6E8B0"/><stop offset="100%" stopColor="#D4A850"/></linearGradient>
+            <linearGradient id="dp-t3" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#F8ECC0"/><stop offset="60%" stopColor="#DDB860"/><stop offset="100%" stopColor="#A87228"/></linearGradient>
+            <linearGradient id="dp-t4" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stopColor="#F0D898"/><stop offset="100%" stopColor="#C08838"/></linearGradient>
+            <filter id="dp-ts"><feDropShadow dx="0" dy="6" stdDeviation="8" floodColor="#7A4A10" floodOpacity="0.3"/></filter>
           </defs>
           <g filter="url(#dp-ts)">
-            {/* Поднос-основа */}
-            <rect x="16" y="104" width="128" height="22" rx="8" fill="url(#dp-t1)"/>
-            <rect x="22" y="108" width="116" height="14" rx="5" fill="url(#dp-t2)" opacity="0.6"/>
-            <path d="M26 110 Q80 108 134 110" stroke="#7A5020" strokeWidth="1" opacity="0.2" strokeLinecap="round"/>
-            <path d="M24 116 Q80 114 136 116" stroke="#7A5020" strokeWidth="1" opacity="0.2" strokeLinecap="round"/>
-            {/* Маслёнка — прямоугольный ящичек с крышкой */}
-            <rect x="22" y="74" width="52" height="32" rx="5" fill="url(#dp-t1)"/>
-            <rect x="26" y="78" width="44" height="24" rx="3" fill="url(#dp-t2)" opacity="0.6"/>
-            <rect x="22" y="68" width="52" height="10" rx="4" fill="url(#dp-t3)"/>
-            <rect x="42" y="62" width="12" height="8" rx="3" fill="url(#dp-t1)"/>
-            <rect x="22" y="74" width="52" height="32" rx="5" stroke="rgba(230,185,110,0.3)" strokeWidth="1" fill="none"/>
-            {/* Сырница — закруглённая коробочка */}
-            <rect x="86" y="76" width="54" height="30" rx="5" fill="url(#dp-t3)"/>
-            <path d="M86 86 Q113 78 140 86" fill="url(#dp-t1)"/>
-            <path d="M86 86 Q113 78 140 86" stroke="rgba(230,185,110,0.3)" strokeWidth="1" fill="none"/>
-            <rect x="104" y="70" width="18" height="8" rx="3" fill="url(#dp-t1)"/>
-            <rect x="86" y="76" width="54" height="30" rx="5" stroke="rgba(230,185,110,0.3)" strokeWidth="1" fill="none"/>
-            {/* Блюдце */}
-            <ellipse cx="80" cy="104" rx="62" ry="6" fill="url(#dp-t1)" opacity="0.4"/>
+            {/* Тень-подставка */}
+            <ellipse cx="80" cy="132" rx="52" ry="8" fill="rgba(120,70,15,0.18)"/>
+            {/* Основание маслёнки */}
+            <rect x="28" y="100" width="104" height="28" rx="10" fill="url(#dp-t1)"/>
+            <rect x="34" y="104" width="92" height="20" rx="7" fill="url(#dp-t2)" opacity="0.65"/>
+            <path d="M38 110 Q80 108 122 110" stroke="#7A4A10" strokeWidth="1" strokeLinecap="round" opacity="0.2"/>
+            <path d="M36 118 Q80 116 124 118" stroke="#7A4A10" strokeWidth="1" strokeLinecap="round" opacity="0.2"/>
+            <rect x="28" y="100" width="104" height="28" rx="10" stroke="rgba(240,195,110,0.35)" strokeWidth="1.5" fill="none"/>
+            {/* Крышка маслёнки */}
+            <path d="M36 100 Q40 58 80 50 Q120 58 124 100 Z" fill="url(#dp-t3)"/>
+            <path d="M44 100 Q47 66 80 60 Q113 66 116 100 Z" fill="url(#dp-t2)" opacity="0.38"/>
+            {/* Волокна дерева на крышке */}
+            <path d="M52 90 Q80 85 108 90" stroke="#7A4A10" strokeWidth="1" strokeLinecap="round" opacity="0.15"/>
+            <path d="M46 98 Q80 93 114 98" stroke="#7A4A10" strokeWidth="1" strokeLinecap="round" opacity="0.15"/>
+            <path d="M36 100 Q40 58 80 50 Q120 58 124 100" stroke="rgba(240,195,110,0.38)" strokeWidth="1.5" fill="none"/>
+            {/* Ручка */}
+            <rect x="64" y="40" width="32" height="14" rx="7" fill="url(#dp-t4)"/>
+            <rect x="64" y="40" width="32" height="14" rx="7" stroke="rgba(240,195,110,0.4)" strokeWidth="1" fill="none"/>
+            {/* Блик на крышке */}
+            <path d="M58 72 Q80 66 102 72" stroke="rgba(255,245,200,0.5)" strokeWidth="3" strokeLinecap="round"/>
           </g>
         </svg>
       ),
