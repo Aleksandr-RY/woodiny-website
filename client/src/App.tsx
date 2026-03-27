@@ -20,6 +20,7 @@ import AdminSiteEditor from "@/pages/admin-site-editor";
 import AdminMedia from "@/pages/admin-media";
 import AdminBlocks from "@/pages/admin-blocks";
 import AdminPortfolio from "@/pages/admin-portfolio";
+import AdminEmail from "@/pages/admin-email";
 import LandingPage from "@/pages/landing";
 
 function AdminPage({ children }: { children: React.ReactNode }) {
@@ -60,6 +61,9 @@ function Router() {
       </Route>
       <Route path="/admin/settings">
         <AdminPage><AdminSettings /></AdminPage>
+      </Route>
+      <Route path="/admin/email">
+        <AdminPage><AdminEmail /></AdminPage>
       </Route>
       <Route path="/admin/seo">
         <AdminPage><AdminSEO /></AdminPage>

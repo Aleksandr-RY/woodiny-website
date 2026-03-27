@@ -6,7 +6,7 @@ import { useMutation } from "@tanstack/react-query";
 import {
   LayoutDashboard, MessageSquare, Package, Handshake,
   Star, Users, Newspaper, Phone, Search, BarChart3,
-  LogOut, Menu, X, PenTool, Images, LayoutTemplate, GalleryHorizontalEnd
+  LogOut, Menu, X, PenTool, Images, LayoutTemplate, GalleryHorizontalEnd, Mail
 } from "lucide-react";
 import { useState } from "react";
 const logoPath = "/woodiny-icon.png";
@@ -23,6 +23,7 @@ const navItems = [
   { path: "/admin/news", label: "Новости", icon: Newspaper },
   { path: "/admin/media", label: "Медиатека", icon: Images },
   { path: "/admin/settings", label: "Контакты", icon: Phone },
+  { path: "/admin/email", label: "Email уведомления", icon: Mail },
   { path: "/admin/seo", label: "SEO", icon: Search },
   { path: "/admin/stats", label: "Статистика", icon: BarChart3 },
   { path: "/admin/editor", label: "Доп. редактор", icon: PenTool },
