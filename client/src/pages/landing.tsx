@@ -543,25 +543,43 @@ function ProductsSection({ data }: { data: any }) {
         <svg viewBox="0 0 160 160" fill="none" xmlns="http://www.w3.org/2000/svg">
           <defs>
             <linearGradient id="dp-c1" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stopColor="#DFB478"/><stop offset="100%" stopColor="#9E6E3A"/></linearGradient>
-            <linearGradient id="dp-c2" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stopColor="#F0D498"/><stop offset="100%" stopColor="#C09040"/></linearGradient>
-            <linearGradient id="dp-c3" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#F4DFA0"/><stop offset="100%" stopColor="#B88030"/></linearGradient>
-            <filter id="dp-cs"><feDropShadow dx="0" dy="5" stdDeviation="7" floodColor="#7A4A10" floodOpacity="0.26"/></filter>
+            <linearGradient id="dp-c2" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stopColor="#F5E8C0"/><stop offset="100%" stopColor="#E0CC90"/></linearGradient>
+            <linearGradient id="dp-c3" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#F0D498"/><stop offset="100%" stopColor="#B88030"/></linearGradient>
+            <linearGradient id="dp-c4" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stopColor="#EED090"/><stop offset="100%" stopColor="#A87020"/></linearGradient>
+            <filter id="dp-cs"><feDropShadow dx="0" dy="5" stdDeviation="6" floodColor="#7A4A10" floodOpacity="0.26"/></filter>
           </defs>
           <g filter="url(#dp-cs)">
-            <rect x="30" y="50" width="100" height="60" rx="10" fill="url(#dp-c1)"/>
-            <rect x="38" y="58" width="84" height="44" rx="7" fill="url(#dp-c2)" opacity="0.55"/>
-            <path d="M50 72 Q80 70 110 72" stroke="#7A5020" strokeWidth="1.2" strokeLinecap="round" opacity="0.25"/>
-            <path d="M50 82 Q80 80 110 82" stroke="#7A5020" strokeWidth="1.2" strokeLinecap="round" opacity="0.25"/>
-            <path d="M50 92 Q80 90 110 92" stroke="#7A5020" strokeWidth="1.2" strokeLinecap="round" opacity="0.25"/>
-            <rect x="30" y="50" width="100" height="60" rx="10" stroke="rgba(230,185,110,0.3)" strokeWidth="1.5" fill="none"/>
-            <rect x="56" y="34" width="48" height="22" rx="6" fill="url(#dp-c3)"/>
-            <rect x="56" y="34" width="48" height="22" rx="6" stroke="rgba(230,185,110,0.3)" strokeWidth="1" fill="none"/>
-            <line x1="68" y1="34" x2="68" y2="56" stroke="rgba(100,55,10,0.2)" strokeWidth="1"/>
-            <line x1="80" y1="34" x2="80" y2="56" stroke="rgba(100,55,10,0.2)" strokeWidth="1"/>
-            <line x1="92" y1="34" x2="92" y2="56" stroke="rgba(100,55,10,0.2)" strokeWidth="1"/>
-            <circle cx="80" cy="112" r="8" fill="url(#dp-c3)"/>
-            <line x1="80" y1="110" x2="80" y2="124" stroke="rgba(230,185,110,0.5)" strokeWidth="2" strokeLinecap="round"/>
-            <rect x="30" y="50" width="100" height="10" rx="10" fill="rgba(255,240,190,0.12)"/>
+            {/* Лист ватмана */}
+            <rect x="32" y="22" width="76" height="96" rx="5" fill="url(#dp-c2)"/>
+            <rect x="32" y="22" width="76" height="96" rx="5" stroke="rgba(160,120,40,0.3)" strokeWidth="1" fill="none"/>
+            {/* Загнутый уголок */}
+            <path d="M88 22 L108 22 L88 42 Z" fill="rgba(200,165,80,0.45)"/>
+            <path d="M88 22 L88 42 L108 22" stroke="rgba(160,120,40,0.3)" strokeWidth="1" fill="none"/>
+            {/* Линии текста на листе */}
+            <line x1="44" y1="52" x2="96" y2="52" stroke="rgba(160,120,50,0.3)" strokeWidth="1.2" strokeLinecap="round"/>
+            <line x1="44" y1="62" x2="96" y2="62" stroke="rgba(160,120,50,0.3)" strokeWidth="1.2" strokeLinecap="round"/>
+            <line x1="44" y1="72" x2="80" y2="72" stroke="rgba(160,120,50,0.3)" strokeWidth="1.2" strokeLinecap="round"/>
+            <line x1="44" y1="82" x2="90" y2="82" stroke="rgba(160,120,50,0.3)" strokeWidth="1.2" strokeLinecap="round"/>
+            <line x1="44" y1="92" x2="70" y2="92" stroke="rgba(160,120,50,0.3)" strokeWidth="1.2" strokeLinecap="round"/>
+            {/* Линейка — поверх листа, по диагонали */}
+            <g transform="rotate(40 105 105)">
+              <rect x="88" y="72" width="14" height="68" rx="3" fill="url(#dp-c1)"/>
+              <rect x="88" y="72" width="14" height="68" rx="3" stroke="rgba(230,185,110,0.35)" strokeWidth="1" fill="none"/>
+              <line x1="95" y1="80" x2="102" y2="80" stroke="rgba(100,55,10,0.35)" strokeWidth="1" strokeLinecap="round"/>
+              <line x1="95" y1="88" x2="102" y2="88" stroke="rgba(100,55,10,0.35)" strokeWidth="1" strokeLinecap="round"/>
+              <line x1="95" y1="96" x2="102" y2="96" stroke="rgba(100,55,10,0.35)" strokeWidth="1" strokeLinecap="round"/>
+              <line x1="95" y1="104" x2="102" y2="104" stroke="rgba(100,55,10,0.35)" strokeWidth="1" strokeLinecap="round"/>
+              <line x1="95" y1="112" x2="102" y2="112" stroke="rgba(100,55,10,0.35)" strokeWidth="1" strokeLinecap="round"/>
+              <line x1="95" y1="120" x2="102" y2="120" stroke="rgba(100,55,10,0.35)" strokeWidth="1" strokeLinecap="round"/>
+            </g>
+            {/* Карандаш — поверх листа */}
+            <g transform="rotate(-35 55 115)">
+              <rect x="46" y="60" width="8" height="60" rx="2" fill="url(#dp-c3)"/>
+              <polygon points="46,120 54,120 50,132" fill="url(#dp-c4)"/>
+              <rect x="46" y="60" width="8" height="8" rx="2" fill="rgba(200,140,60,0.9)"/>
+              <rect x="46" y="60" width="8" height="60" rx="2" stroke="rgba(180,130,50,0.3)" strokeWidth="1" fill="none"/>
+              <line x1="50" y1="128" x2="50" y2="132" stroke="rgba(80,40,10,0.6)" strokeWidth="1.5" strokeLinecap="round"/>
+            </g>
           </g>
         </svg>
       ),
