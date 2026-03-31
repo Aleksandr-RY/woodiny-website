@@ -1,12 +1,17 @@
 import nodemailer from "nodemailer";
 import { storage } from "./storage";
 
-async function getSmtpConfig() {
+export async function getSmtpConfig() {
   let host = process.env.SMTP_HOST;
   let port = parseInt(process.env.SMTP_PORT || "0");
   let user = process.env.SMTP_USER;
   let pass = process.env.SMTP_PASS;
   let to = process.env.SMTP_TO;
+  let fromName = "";
+  let subject = "";
+  let cc = "";
+  let bcc = "";
+  let secure = "";
 
   try {
     const settings = await storage.getSettings();
@@ -17,22 +22,30 @@ async function getSmtpConfig() {
     if (!user)  user  = get("smtp_user");
     if (!pass)  pass  = get("smtp_pass");
     if (!to)    to    = get("smtp_to");
+    fromName = get("smtp_from_name");
+    subject  = get("smtp_subject");
+    cc       = get("smtp_cc");
+    bcc      = get("smtp_bcc");
+    secure   = get("smtp_secure");
   } catch (e) {
     console.error("[mailer] ошибка чтения настроек из БД:", e);
   }
 
-  return { host, port: port || 465, user, pass, to };
+  const portNum = port || 465;
+  const isSecure = secure === "" ? portNum === 465 : secure === "1";
+
+  return { host, port: portNum, user, pass, to, fromName, subject, cc, bcc, isSecure };
 }
 
 async function createTransport() {
-  const { host, port, user, pass } = await getSmtpConfig();
+  const { host, port, user, pass, isSecure } = await getSmtpConfig();
 
   if (!host || !user || !pass) return null;
 
   return nodemailer.createTransport({
     host,
     port,
-    secure: port === 465,
+    secure: isSecure,
     auth: { user, pass },
     tls: { rejectUnauthorized: false },
   });
@@ -51,8 +64,11 @@ export async function sendInquiryEmail(inquiry: {
     return;
   }
 
-  const to = config.to || config.user;
-  const from = config.user;
+  const to = config.to || config.user!;
+  const fromLabel = config.fromName || "Woodiny";
+  const subjectText = config.subject
+    ? config.subject.replace("{name}", inquiry.fio)
+    : `Новая заявка от ${inquiry.fio}`;
 
   const html = `
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
@@ -89,15 +105,58 @@ export async function sendInquiryEmail(inquiry: {
     </div>
   `;
 
+  const mailOptions: nodemailer.SendMailOptions = {
+    from: `"${fromLabel}" <${config.user}>`,
+    to,
+    subject: subjectText,
+    html,
+  };
+  if (config.cc)  mailOptions.cc  = config.cc;
+  if (config.bcc) mailOptions.bcc = config.bcc;
+
   try {
-    await transport.sendMail({
-      from: `"Woodiny" <${from}>`,
-      to,
-      subject: `Новая заявка от ${inquiry.fio}`,
-      html,
-    });
+    await transport.sendMail(mailOptions);
     console.log(`[mailer] письмо отправлено на ${to}`);
   } catch (e: any) {
     console.error("[mailer] ошибка отправки:", e.message);
   }
+}
+
+export async function sendTestEmail(): Promise<void> {
+  const config = await getSmtpConfig();
+
+  if (!config.host || !config.user || !config.pass) {
+    throw new Error("SMTP не настроен. Заполните сервер, email и пароль.");
+  }
+
+  const transport = nodemailer.createTransport({
+    host: config.host,
+    port: config.port,
+    secure: config.isSecure,
+    auth: { user: config.user, pass: config.pass },
+    tls: { rejectUnauthorized: false },
+  });
+
+  const to = config.to || config.user;
+  const fromLabel = config.fromName || "Woodiny";
+
+  await transport.sendMail({
+    from: `"${fromLabel}" <${config.user}>`,
+    to,
+    subject: "Тест — Email уведомления Woodiny",
+    html: `
+      <div style="font-family: Arial, sans-serif; max-width: 500px; margin: 0 auto;">
+        <h2 style="color: #2C1D0E; border-bottom: 2px solid #C4975A; padding-bottom: 10px;">
+          Тестовое письмо
+        </h2>
+        <p style="color: #444; line-height: 1.6;">
+          Это тестовое письмо отправлено из панели администратора <strong>Woodiny</strong>.<br>
+          Если вы его получили — настройки SMTP работают корректно.
+        </p>
+        <p style="margin-top: 24px; color: #888; font-size: 13px;">
+          woodiny.ru
+        </p>
+      </div>
+    `,
+  });
 }

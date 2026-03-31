@@ -4,7 +4,7 @@ import session from "express-session";
 import createMemoryStore from "memorystore";
 import bcrypt from "bcryptjs";
 import { storage } from "./storage";
-import { sendInquiryEmail } from "./mailer";
+import { sendInquiryEmail, sendTestEmail } from "./mailer";
 import fs from "fs";
 import path from "path";
 import multer from "multer";
@@ -341,6 +341,15 @@ export async function registerRoutes(
       res.json(item);
     } catch (e: any) {
       res.status(400).json({ message: e.message });
+    }
+  });
+
+  app.post("/api/email/test", requireAuth, async (_req, res) => {
+    try {
+      await sendTestEmail();
+      res.json({ ok: true, message: "Тестовое письмо отправлено" });
+    } catch (e: any) {
+      res.status(500).json({ message: e.message });
     }
   });
 
