@@ -44,6 +44,73 @@ export async function getSmtpConfig() {
   return { host, port: portNum, user, pass, to, fromName, subject, cc, bcc, isSecure };
 }
 
+export async function getEmailProvider(): Promise<"smtp" | "brevo"> {
+  try {
+    const settings = await storage.getSettings();
+    const val = settings.find((s) => s.key === "email_provider")?.value;
+    if (val === "brevo") return "brevo";
+  } catch {}
+  return "smtp";
+}
+
+export async function getBrevoConfig() {
+  try {
+    const settings = await storage.getSettings();
+    const get = (key: string) => settings.find((s) => s.key === key)?.value || "";
+    return {
+      apiKey:    get("brevo_api_key"),
+      fromEmail: get("brevo_from_email"),
+      fromName:  get("brevo_from_name") || get("smtp_from_name") || "Woodiny",
+      to:        get("brevo_to") || get("smtp_to"),
+      subject:   get("smtp_subject"),
+      cc:        get("smtp_cc"),
+      bcc:       get("smtp_bcc"),
+    };
+  } catch {
+    return { apiKey: "", fromEmail: "", fromName: "Woodiny", to: "", subject: "", cc: "", bcc: "" };
+  }
+}
+
+async function sendViaBrevo(opts: {
+  apiKey: string;
+  from: { name: string; email: string };
+  to: string;
+  subject: string;
+  html: string;
+  cc?: string;
+  bcc?: string;
+}) {
+  const toList = [{ email: opts.to }];
+  const ccList = opts.cc ? [{ email: opts.cc }] : undefined;
+  const bccList = opts.bcc ? [{ email: opts.bcc }] : undefined;
+
+  const body: Record<string, unknown> = {
+    sender: opts.from,
+    to: toList,
+    subject: opts.subject,
+    htmlContent: opts.html,
+  };
+  if (ccList)  body.cc  = ccList;
+  if (bccList) body.bcc = bccList;
+
+  const resp = await fetch("https://api.brevo.com/v3/smtp/email", {
+    method: "POST",
+    headers: {
+      "api-key": opts.apiKey,
+      "Content-Type": "application/json",
+      Accept: "application/json",
+    },
+    body: JSON.stringify(body),
+  });
+
+  if (!resp.ok) {
+    const errText = await resp.text();
+    let errMsg = `Brevo ошибка ${resp.status}`;
+    try { errMsg = JSON.parse(errText).message || errMsg; } catch {}
+    throw new Error(errMsg);
+  }
+}
+
 async function createTransport() {
   const { host, port, user, pass, isSecure } = await getSmtpConfig();
 
@@ -61,26 +128,8 @@ async function createTransport() {
   });
 }
 
-export async function sendInquiryEmail(inquiry: {
-  fio: string;
-  phone: string;
-  email?: string | null;
-  message?: string | null;
-}) {
-  const config = await getSmtpConfig();
-  const transport = await createTransport();
-  if (!transport) {
-    console.log("[mailer] SMTP не настроен, письмо не отправлено");
-    return;
-  }
-
-  const to = config.to || config.user!;
-  const fromLabel = config.fromName || "Woodiny";
-  const subjectText = config.subject
-    ? config.subject.replace("{name}", inquiry.fio)
-    : `Новая заявка от ${inquiry.fio}`;
-
-  const html = `
+function buildHtml(inquiry: { fio: string; phone: string; email?: string | null; message?: string | null }) {
+  return `
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
       <h2 style="color: #2C1D0E; border-bottom: 2px solid #C4975A; padding-bottom: 10px;">
         Новая заявка с сайта Woodiny
@@ -114,6 +163,56 @@ export async function sendInquiryEmail(inquiry: {
       </p>
     </div>
   `;
+}
+
+export async function sendInquiryEmail(inquiry: {
+  fio: string;
+  phone: string;
+  email?: string | null;
+  message?: string | null;
+}) {
+  const provider = await getEmailProvider();
+  const html = buildHtml(inquiry);
+
+  if (provider === "brevo") {
+    const brevo = await getBrevoConfig();
+    if (!brevo.apiKey || !brevo.fromEmail || !brevo.to) {
+      console.log("[mailer] Brevo не настроен, письмо не отправлено");
+      return;
+    }
+    const subjectText = brevo.subject
+      ? brevo.subject.replace("{name}", inquiry.fio)
+      : `Новая заявка от ${inquiry.fio}`;
+    try {
+      await sendViaBrevo({
+        apiKey: brevo.apiKey,
+        from: { name: brevo.fromName, email: brevo.fromEmail },
+        to: brevo.to,
+        subject: subjectText,
+        html,
+        cc: brevo.cc || undefined,
+        bcc: brevo.bcc || undefined,
+      });
+      console.log(`[mailer][brevo] письмо отправлено на ${brevo.to}`);
+    } catch (e: any) {
+      console.error("[mailer][brevo] ошибка:", e.message);
+    }
+    return;
+  }
+
+  // SMTP path
+  const config = await getSmtpConfig();
+  const transport = await createTransport();
+  if (!transport) {
+    console.log("[mailer] SMTP не настроен, письмо не отправлено");
+    return;
+  }
+
+  const to = config.to || config.user!;
+  const fromLabel = config.fromName || "Woodiny";
+  const subjectText = config.subject
+    ? config.subject.replace("{name}", inquiry.fio)
+    : `Новая заявка от ${inquiry.fio}`;
 
   const mailOptions: nodemailer.SendMailOptions = {
     from: `"${fromLabel}" <${config.user}>`,
@@ -133,6 +232,36 @@ export async function sendInquiryEmail(inquiry: {
 }
 
 export async function sendTestEmail(): Promise<void> {
+  const provider = await getEmailProvider();
+
+  if (provider === "brevo") {
+    const brevo = await getBrevoConfig();
+    if (!brevo.apiKey) throw new Error("Brevo: API ключ не заполнен.");
+    if (!brevo.fromEmail) throw new Error("Brevo: Email отправителя не заполнен.");
+    if (!brevo.to) throw new Error("Brevo: Email получателя не заполнен.");
+
+    await sendViaBrevo({
+      apiKey: brevo.apiKey,
+      from: { name: brevo.fromName, email: brevo.fromEmail },
+      to: brevo.to,
+      subject: "Тест — Email уведомления Woodiny",
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 500px; margin: 0 auto;">
+          <h2 style="color: #2C1D0E; border-bottom: 2px solid #C4975A; padding-bottom: 10px;">
+            Тестовое письмо
+          </h2>
+          <p style="color: #444; line-height: 1.6;">
+            Это тестовое письмо отправлено через <strong>Brevo API</strong> из панели администратора <strong>Woodiny</strong>.<br>
+            Если вы его получили — настройки работают корректно.
+          </p>
+          <p style="margin-top: 24px; color: #888; font-size: 13px;">woodiny.ru</p>
+        </div>
+      `,
+    });
+    return;
+  }
+
+  // SMTP path
   const config = await getSmtpConfig();
 
   if (!config.host || !config.user || !config.pass) {
