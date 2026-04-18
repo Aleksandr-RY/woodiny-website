@@ -1,0 +1,32 @@
+
+/home/depl/.pm2/logs/woodiny-error.log last 30 lines:
+2|woodiny  |     at g (/var/www/woodiny/dist/index.cjs:43:5723)
+2|woodiny  |     at Oe.<anonymous> (/var/www/woodiny/dist/index.cjs:57:10086)
+2|woodiny  |     at Oe.emit (node:events:524:28)
+2|woodiny  | URIError: Failed to decode param '%c0%2e%c0%2e'
+2|woodiny  |     at decodeURIComponent (<anonymous>)
+2|woodiny  |     at t1 (/var/www/woodiny/dist/index.cjs:43:2021)
+2|woodiny  |     at Array.map (<anonymous>)
+2|woodiny  |     at /var/www/woodiny/dist/index.cjs:39:21278
+2|woodiny  |     at Array.<anonymous> (/var/www/woodiny/dist/index.cjs:39:21455)
+2|woodiny  |     at qr.match (/var/www/woodiny/dist/index.cjs:43:1816)
+2|woodiny  |     at Gj (/var/www/woodiny/dist/index.cjs:43:7738)
+2|woodiny  |     at g (/var/www/woodiny/dist/index.cjs:43:5723)
+2|woodiny  |     at Oe.<anonymous> (/var/www/woodiny/dist/index.cjs:57:10086)
+2|woodiny  |     at Oe.emit (node:events:524:28)
+2|woodiny  | URIError: Failed to decode param '%c0%2e%c0%2e'
+2|woodiny  |     at decodeURIComponent (<anonymous>)
+2|woodiny  |     at t1 (/var/www/woodiny/dist/index.cjs:43:2021)
+2|woodiny  |     at Array.map (<anonymous>)
+2|woodiny  |     at /var/www/woodiny/dist/index.cjs:39:21278
+2|woodiny  |     at Array.<anonymous> (/var/www/woodiny/dist/index.cjs:39:21455)
+2|woodiny  |     at qr.match (/var/www/woodiny/dist/index.cjs:43:1816)
+2|woodiny  |     at Gj (/var/www/woodiny/dist/index.cjs:43:7738)
+2|woodiny  |     at g (/var/www/woodiny/dist/index.cjs:43:5723)
+2|woodiny  |     at Oe.<anonymous> (/var/www/woodiny/dist/index.cjs:57:10086)
+2|woodiny  |     at Oe.emit (node:events:524:28)
+2|woodiny  | Error: ENOENT: no such file or directory, stat '/var/www/woodiny/dist/public/index.html'
+2|woodiny  | Error: ENOENT: no such file or directory, stat '/var/www/woodiny/dist/public/index.html'
+2|woodiny  | Error: ENOENT: no such file or directory, stat '/var/www/woodiny/dist/public/index.html'
+2|woodiny  | Error: ENOENT: no such file or directory, stat '/var/www/woodiny/dist/public/index.html'
+2|woodiny  | Error: ENOENT: no such file or directory, stat '/var/www/woodiny/dist/public/index.html'
