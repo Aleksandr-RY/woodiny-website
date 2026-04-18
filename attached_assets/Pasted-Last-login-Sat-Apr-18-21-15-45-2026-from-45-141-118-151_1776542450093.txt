@@ -1,0 +1,31 @@
+Last login: Sat Apr 18 21:15:45 2026 from 45.141.118.151
+depl@cv6097943:~$ pm2 logs woodiny --lines 20
+[TAILING] Tailing last 20 lines for [woodiny] process (change the value with --lines option)
+/home/depl/.pm2/logs/woodiny-error.log last 20 lines:
+2|woodiny  |     at Gj (/var/www/woodiny/dist/index.cjs:43:7738)
+2|woodiny  |     at g (/var/www/woodiny/dist/index.cjs:43:5723)
+2|woodiny  |     at Oe.<anonymous> (/var/www/woodiny/dist/index.cjs:57:10086)
+2|woodiny  |     at Oe.emit (node:events:524:28)
+2|woodiny  | URIError: Failed to decode param '%c0%2e%c0%2e'
+2|woodiny  |     at decodeURIComponent (<anonymous>)
+2|woodiny  |     at t1 (/var/www/woodiny/dist/index.cjs:43:2021)
+2|woodiny  |     at Array.map (<anonymous>)
+2|woodiny  |     at /var/www/woodiny/dist/index.cjs:39:21278
+2|woodiny  |     at Array.<anonymous> (/var/www/woodiny/dist/index.cjs:39:21455)
+2|woodiny  |     at qr.match (/var/www/woodiny/dist/index.cjs:43:1816)
+2|woodiny  |     at Gj (/var/www/woodiny/dist/index.cjs:43:7738)
+2|woodiny  |     at g (/var/www/woodiny/dist/index.cjs:43:5723)
+2|woodiny  |     at Oe.<anonymous> (/var/www/woodiny/dist/index.cjs:57:10086)
+2|woodiny  |     at Oe.emit (node:events:524:28)
+2|woodiny  | Error: ENOENT: no such file or directory, stat '/var/www/woodiny/dist/public/index.html'
+2|woodiny  | Error: ENOENT: no such file or directory, stat '/var/www/woodiny/dist/public/index.html'
+2|woodiny  | Error: ENOENT: no such file or directory, stat '/var/www/woodiny/dist/public/index.html'
+2|woodiny  | Error: ENOENT: no such file or directory, stat '/var/www/woodiny/dist/public/index.html'
+2|woodiny  | Error: ENOENT: no such file or directory, stat '/var/www/woodiny/dist/public/index.html'
+
+/home/depl/.pm2/logs/woodiny-out.log last 20 lines:
+2|woodiny  | :true,"sortOrder":8}]
+2|woodiny  | 11:00:15 PM [express] GET /api/products 200 in 2ms :: []
+2|woodiny  | 11:00:15 PM [express] POST /api/track 200 in 12ms :: {"ok":true}
+2|woodiny  | 11:00:15 PM [express] GET /api/portfolio 200 in 3ms :: [{"id":3,"title":"Менажница квадратная","description":"","imageUrl":"/uploads/1773849987177-ugt6qv.jpg","sortOrder":0,"isActive":true},{"id":7,"title":"Менажница \"Аэро\"","description":"","imageUrl":"/uploads/1773850085301-sbkqqc.jpg","sortOrder":0,"isActive":true},{"id":5,"title":"Блюдо с стеклянным колпаком","description":"","imageUrl":"/uploads/1773850051762-3t5dbm.jpg","sortOrder":0,"isActive":true},{"id":9,"title":"Менажница 3 секции \"Мерседес\"","description":"","imageUrl":"/uploads/1773850119885-2xzssz.jpg","sortOrder":0,"isActive":true},{"id":1,"title":"Маслёнка","description":"","imageUrl":"/uploads/1773849935803-h40qub.jpg","sortOrder":0,"isActive":true},{"id":11,"title":"Менажница 4 секции","description":"","imageUrl":"/uploads/1773851601997-u81any.jpg","sortOrder":0,"isActive":true},{"id":12,"title":"Менажница 5 секций","description":"","imageUrl":"/uploads/1773856270122-0bfkbi.jpg","sortOrder":0,"isActive":true},{"id":13,"title":"Менажница 6 секций","description":"","imageUrl":"/uploads/1773856288993-q45fj8.jpg","sortOrder":0,"isActive":true},{"id":14,"title":"Менажница 7 секций","description":"","imageUrl":"/uploads/1773856313197-qk7nse.jpg","sortOrder":0,"isActive":true},{"id":15,"title":"Менажница блюдо","description":"","imageUrl":"/uploads/1773856324414-cfs13h.jpg","sortOrder":0,"isActive":true}]
+2|woodiny  | 11:00:15 PM [express] GET /api/blocks 200 in 24ms :: [{"id":1,"type":"hero","order":0,"data":"{\"title\":\"Крупносерийное производство изделий из дерева\",\"subtitle\":\"Разделочные доски, подносы, кухонные принадлежности и декор из массива. Работаем с B2B-клиентами по всей России.\",\"cta\":\"Оставить заявку\"}","isActive":true},{"id":2,"type":"clients","order":1,"data":"{\"title\":\"Нам доверяют\"}","isActive":true},{"id":3,"type":"features","order":2,"data":"{\"title\":\"Почему выбирают нас\",\"items\":[{\"icon\":\"factory\",\"title\":\"Собственное производство\",\"description\":\"1500 м² в Московской области\"},{\"icon\":\"truck\",\"title\":\"Быстрая доставка\",\"description\":\"По всей России\"},{\"icon\":\"shield\",\"title\":\"Гарантия качества\",\"description\":\"Контроль на каждом этапе\"}]}","isActive":true},{"id":4,"type":"products","order":3,"data":"{\"title\":\"Каталог продукции\",\"description\":\"Широкий ассортимент деревянных изделий для вашего бизнеса\"}","isActive":true},{"id":5,"type":"portfolio","order":4,"data":"{\"title\":\"Портфолио\",\"description\":\"Примеры наших работ\"}","isActive":true},{"id":6,"type":"process","order":5,"data":"{\"title\":\"Как мы работаем\",\"steps\":[{\"title\":\"Заявка\",\"description\":\"Оставьте заявку или позвоните нам\"},{\"title\":\"Расчёт\",\"description\":\"Рассчитаем стоимость и сроки\"},{\"title\":\"Производство\",\"description\":\"Изготовим в срок с контролем качества\"},{\"title\":\"Доставка\",\"description\":\"Доставим в любую точку России\"}]}","isActive":true},{"id":7,"type":"contacts","order":6,"data":"{\"title\":\"Свяжитесь с нами\",\"phone\":\"+7 (495) 000-00-00\",\"email\":\"info@woodiny.ru\",\"address\":\"Московская область\"}","isActive":true}]
