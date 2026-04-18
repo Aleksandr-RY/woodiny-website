@@ -1,0 +1,117 @@
+ rest-express@1.0.0 build
+> tsx script/build.ts
+
+building client...
+using vite.config.production.ts
+vite v7.3.0 building client environment for production...
+transforming (1) src/main.tsxBrowserslist: browsers data (caniuse-lite) is 6 months old. Please run:
+  npx update-browserslist-db@latest
+  Why you should do it regularly: https://github.com/browserslist/update-db#readme
+transforming (5) ../node_modules/@tanstack/react-query/build/modern/index.js
+A PostCSS plugin did not pass the `from` option to `postcss.parse`. This may cause imported assets to be incorrectly transformed. If you've recently added a PostCSS plugin that raised this warning, please contact the package author to fix the issue.
+✓ 29 modules transformed.
+✗ Build failed in 3.30s
+[vite]: Rollup failed to resolve import "@dnd-kit/core" from "/var/www/woodiny/client/src/pages/admin-portfolio.tsx".
+This is most likely unintended because it can break your application at runtime.
+If you do want to externalize this module explicitly add it to
+`build.rollupOptions.external`
+    at viteLog (/var/www/woodiny/node_modules/vite/dist/node/chunks/config.js:33634:57)
+    at <anonymous> (/var/www/woodiny/node_modules/vite/dist/node/chunks/config.js:33668:73)
+    at onwarn (/var/www/woodiny/node_modules/@vitejs/plugin-react/dist/index.js:90:7)
+    at <anonymous> (/var/www/woodiny/node_modules/vite/dist/node/chunks/config.js:33668:28)
+    at onRollupLog (/var/www/woodiny/node_modules/vite/dist/node/chunks/config.js:33663:63)
+    at onLog (/var/www/woodiny/node_modules/vite/dist/node/chunks/config.js:33466:4)
+    at <anonymous> (/var/www/woodiny/node_modules/rollup/dist/es/shared/node-entry.js:21004:32)
+    at Object.logger (/var/www/woodiny/node_modules/rollup/dist/es/shared/node-entry.js:22891:9)
+    at ModuleLoader.handleInvalidResolvedId (/var/www/woodiny/node_modules/rollup/dist/es/shared/node-entry.js:21635:26)
+    at <anonymous> (/var/www/woodiny/node_modules/rollup/dist/es/shared/node-entry.js:21593:26) {
+  watchFiles: [
+    '/var/www/woodiny/client/index.html',
+    '/var/www/woodiny/client/src/main.tsx',
+    '/var/www/woodiny/package.json',
+    '/var/www/woodiny/node_modules/react/jsx-runtime.js',
+    '/var/www/woodiny/node_modules/react-dom/client.js',
+    '/var/www/woodiny/client/src/App.tsx',
+    '/var/www/woodiny/client/src/index.css',
+    '/var/www/woodiny/node_modules/react/cjs/react-jsx-runtime.production.min.js',
+    '/var/www/woodiny/node_modules/react-dom/index.js',
+    '/var/www/woodiny/client/src/lib/queryClient.ts',
+    '/var/www/woodiny/client/src/components/ui/toaster.tsx',
+    '/var/www/woodiny/client/src/components/ui/tooltip.tsx',
+    '/var/www/woodiny/client/src/pages/not-found.tsx',
+    '/var/www/woodiny/client/src/pages/admin-login.tsx',
+    '/var/www/woodiny/client/src/pages/admin-layout.tsx',
+    '/var/www/woodiny/client/src/pages/admin-dashboard.tsx',
+    '/var/www/woodiny/client/src/pages/admin-inquiries.tsx',
+    '/var/www/woodiny/client/src/pages/admin-products.tsx',
+    '/var/www/woodiny/client/src/pages/admin-partners.tsx',
+    '/var/www/woodiny/client/src/pages/admin-reviews.tsx',
+    '/var/www/woodiny/client/src/pages/admin-staff.tsx',
+    '/var/www/woodiny/client/src/pages/admin-news.tsx',
+    '/var/www/woodiny/client/src/pages/admin-settings.tsx',
+    '/var/www/woodiny/client/src/pages/admin-seo.tsx',
+    '/var/www/woodiny/client/src/pages/admin-stats.tsx',
+    '/var/www/woodiny/client/src/pages/admin-site-editor.tsx',
+    '/var/www/woodiny/client/src/pages/admin-media.tsx',
+    '/var/www/woodiny/client/src/pages/admin-blocks.tsx',
+    '/var/www/woodiny/client/src/pages/admin-portfolio.tsx',
+    '/var/www/woodiny/client/src/pages/admin-email.tsx',
+    '/var/www/woodiny/client/src/pages/landing.tsx',
+    '/var/www/woodiny/node_modules/@tanstack/react-query/build/modern/index.js',
+    '/var/www/woodiny/node_modules/wouter/esm/index.js',
+    '/var/www/woodiny/node_modules/react/index.js',
+    '/var/www/woodiny/client/src/hooks/use-toast.ts',
+    '/var/www/woodiny/client/src/lib/utils.ts',
+    '/var/www/woodiny/client/src/components/image-upload.tsx',
+    '/var/www/woodiny/client/src/components/media-picker.tsx',
+    '/var/www/woodiny/client/src/components/rich-text-editor.tsx',
+    '/var/www/woodiny/client/src/components/ui/accordion.tsx',
+    '/var/www/woodiny/client/src/components/ui/alert-dialog.tsx',
+    '/var/www/woodiny/client/src/components/ui/alert.tsx',
+    '/var/www/woodiny/client/src/components/ui/aspect-ratio.tsx',
+    '/var/www/woodiny/client/src/components/ui/avatar.tsx',
+    '/var/www/woodiny/client/src/components/ui/badge.tsx',
+    '/var/www/woodiny/client/src/components/ui/breadcrumb.tsx',
+    '/var/www/woodiny/client/src/components/ui/button.tsx',
+    '/var/www/woodiny/client/src/components/ui/calendar.tsx',
+    '/var/www/woodiny/client/src/components/ui/card.tsx',
+    '/var/www/woodiny/client/src/components/ui/carousel.tsx',
+    '/var/www/woodiny/client/src/components/ui/chart.tsx',
+    '/var/www/woodiny/client/src/components/ui/checkbox.tsx',
+    '/var/www/woodiny/client/src/components/ui/collapsible.tsx',
+    '/var/www/woodiny/client/src/components/ui/command.tsx',
+    '/var/www/woodiny/client/src/components/ui/context-menu.tsx',
+    '/var/www/woodiny/client/src/components/ui/dialog.tsx',
+    '/var/www/woodiny/client/src/components/ui/drawer.tsx',
+    '/var/www/woodiny/client/src/components/ui/dropdown-menu.tsx',
+    '/var/www/woodiny/client/src/components/ui/form.tsx',
+    '/var/www/woodiny/client/src/components/ui/hover-card.tsx',
+    '/var/www/woodiny/client/src/components/ui/input-otp.tsx',
+    '/var/www/woodiny/client/src/components/ui/input.tsx',
+    '/var/www/woodiny/client/src/components/ui/label.tsx',
+    '/var/www/woodiny/client/src/components/ui/menubar.tsx',
+    '/var/www/woodiny/client/src/components/ui/navigation-menu.tsx',
+    '/var/www/woodiny/client/src/components/ui/pagination.tsx',
+    '/var/www/woodiny/client/src/components/ui/popover.tsx',
+    '/var/www/woodiny/client/src/components/ui/progress.tsx',
+    '/var/www/woodiny/client/src/components/ui/radio-group.tsx',
+    '/var/www/woodiny/client/src/components/ui/resizable.tsx',
+    '/var/www/woodiny/client/src/components/ui/scroll-area.tsx',
+    '/var/www/woodiny/client/src/components/ui/select.tsx',
+    '/var/www/woodiny/client/src/components/ui/separator.tsx',
+    '/var/www/woodiny/client/src/components/ui/sheet.tsx',
+    '/var/www/woodiny/client/src/components/ui/sidebar.tsx',
+    '/var/www/woodiny/client/src/components/ui/skeleton.tsx',
+    '/var/www/woodiny/client/src/components/ui/slider.tsx',
+    '/var/www/woodiny/client/src/components/ui/switch.tsx',
+    '/var/www/woodiny/client/src/components/ui/table.tsx',
+    '/var/www/woodiny/client/src/components/ui/tabs.tsx',
+    '/var/www/woodiny/client/src/components/ui/textarea.tsx',
+    '/var/www/woodiny/client/src/components/ui/toast.tsx',
+    '/var/www/woodiny/client/src/components/ui/toggle-group.tsx',
+    '/var/www/woodiny/client/src/components/ui/toggle.tsx',
+    '/var/www/woodiny/client/src/hooks/use-mobile.tsx',
+    '/var/www/woodiny/tailwind.config.ts',
+    '/var/www/woodiny/node_modules/react-dom/cjs/react-dom.production.min.js'
+  ]
+}
