@@ -55,6 +55,9 @@ async function createTransport() {
     secure: isSecure,
     auth: { user, pass },
     tls: { rejectUnauthorized: false },
+    connectionTimeout: 10000,
+    socketTimeout: 10000,
+    greetingTimeout: 10000,
   });
 }
 
@@ -142,6 +145,9 @@ export async function sendTestEmail(): Promise<void> {
     secure: config.isSecure,
     auth: { user: config.user, pass: config.pass },
     tls: { rejectUnauthorized: false },
+    connectionTimeout: 10000,
+    socketTimeout: 10000,
+    greetingTimeout: 10000,
   });
 
   const to = config.to || config.user;
