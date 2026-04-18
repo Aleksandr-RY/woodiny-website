@@ -66,22 +66,22 @@ export default function AdminEmail() {
     setTestState("loading");
     setTestMsg("");
     try {
-      const res = await apiRequest("POST", "/api/email/test", {});
+      const res = await fetch("/api/email/test", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+      });
       const data = await res.json();
-      setTestState("success");
-      setTestMsg(data.message || "Письмо отправлено");
+      if (!res.ok) {
+        setTestState("error");
+        setTestMsg(data.message || `Ошибка ${res.status}`);
+      } else {
+        setTestState("success");
+        setTestMsg(data.message || "Письмо отправлено");
+      }
     } catch (e: any) {
-      let msg = "Ошибка отправки";
-      try {
-        const raw: string = e.message || "";
-        const jsonStart = raw.indexOf("{");
-        if (jsonStart !== -1) {
-          const parsed = JSON.parse(raw.slice(jsonStart));
-          msg = parsed.message || msg;
-        }
-      } catch {}
       setTestState("error");
-      setTestMsg(msg);
+      setTestMsg(e.message || "Ошибка сети");
     }
   };
 
