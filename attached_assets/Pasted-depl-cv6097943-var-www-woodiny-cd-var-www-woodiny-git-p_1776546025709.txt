@@ -1,0 +1,41 @@
+depl@cv6097943:/var/www/woodiny$ cd /var/www/woodiny && git pull origin main && npm run build && pm2 restart woodiny
+From https://github.com/Aleksandr-RY/woodiny-website
+ * branch            main       -> FETCH_HEAD
+Already up to date.
+
+> rest-express@1.0.0 build
+> tsx script/build.ts
+
+building client...
+using vite.config.production.ts
+vite v7.3.0 building client environment for production...
+transforming (1) src/main.tsxBrowserslist: browsers data (caniuse-lite) is 6 months old. Please run:
+  npx update-browserslist-db@latest
+  Why you should do it regularly: https://github.com/browserslist/update-db#readme
+transforming (28) src/pages/landing.tsx
+A PostCSS plugin did not pass the `from` option to `postcss.parse`. This may cause imported assets to be incorrectly transformed. If you've recently added a PostCSS plugin that raised this warning, please contact the package author to fix the issue.
+✓ 1800 modules transformed.
+../dist/public/index.html                   2.34 kB │ gzip:   0.93 kB
+../dist/public/assets/index-gu1Oxesd.css  133.38 kB │ gzip:  21.27 kB
+../dist/public/assets/index-DQ-uwC-v.js   931.88 kB │ gzip: 288.18 kB
+
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+✓ built in 10.22s
+building server...
+
+  dist/index.cjs  1.5mb ⚠️
+
+⚡ Done in 264ms
+Use --update-env to update environment variables
+[PM2] Applying action restartProcessId on app [woodiny](ids: [ 2 ])
+[PM2] [woodiny](2) ✓
+┌────┬────────────────────┬──────────┬──────┬───────────┬──────────┬──────────┐
+│ id │ name               │ mode     │ ↺    │ status    │ cpu      │ memory   │
+├────┼────────────────────┼──────────┼──────┼───────────┼──────────┼──────────┤
+│ 2  │ woodiny            │ fork     │ 27   │ online    │ 0%       │ 19.6mb   │
+│ 0  │ woodinycurl        │ fork     │ 0    │ online    │ 0%       │ 82.8mb   │
+└────┴────────────────────┴──────────┴──────┴───────────┴──────────┴──────────┘
+depl@cv6097943:/var/www/woodiny$
