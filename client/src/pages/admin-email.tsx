@@ -71,10 +71,12 @@ export default function AdminEmail() {
         headers: { "Content-Type": "application/json" },
         credentials: "include",
       });
-      const data = await res.json();
-      if (!res.ok) {
+      const text = await res.text();
+      let data: any = {};
+      try { data = JSON.parse(text); } catch { /* HTML response */ }
+      if (!res.ok || !data.ok) {
         setTestState("error");
-        setTestMsg(data.message || `Ошибка ${res.status}`);
+        setTestMsg(data.message || (text.startsWith("<") ? `Ошибка ${res.status}: маршрут не найден на сервере` : text));
       } else {
         setTestState("success");
         setTestMsg(data.message || "Письмо отправлено");
