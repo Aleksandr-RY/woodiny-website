@@ -2,11 +2,11 @@ import nodemailer from "nodemailer";
 import { storage } from "./storage";
 
 export async function getSmtpConfig() {
-  let host = process.env.SMTP_HOST;
-  let port = parseInt(process.env.SMTP_PORT || "0");
-  let user = process.env.SMTP_USER;
-  let pass = process.env.SMTP_PASS;
-  let to = process.env.SMTP_TO;
+  let host = "";
+  let portStr = "";
+  let user = "";
+  let pass = "";
+  let to = "";
   let fromName = "";
   let subject = "";
   let cc = "";
@@ -17,11 +17,11 @@ export async function getSmtpConfig() {
     const settings = await storage.getSettings();
     const get = (key: string) => settings.find((s) => s.key === key)?.value || "";
 
-    if (!host)  host  = get("smtp_host");
-    if (!port)  port  = parseInt(get("smtp_port") || "465");
-    if (!user)  user  = get("smtp_user");
-    if (!pass)  pass  = get("smtp_pass");
-    if (!to)    to    = get("smtp_to");
+    host     = get("smtp_host");
+    portStr  = get("smtp_port");
+    user     = get("smtp_user");
+    pass     = get("smtp_pass");
+    to       = get("smtp_to");
     fromName = get("smtp_from_name");
     subject  = get("smtp_subject");
     cc       = get("smtp_cc");
@@ -31,7 +31,14 @@ export async function getSmtpConfig() {
     console.error("[mailer] ошибка чтения настроек из БД:", e);
   }
 
-  const portNum = port || 465;
+  // Env vars used only as fallback when DB is empty
+  if (!host)    host    = process.env.SMTP_HOST || "";
+  if (!portStr) portStr = process.env.SMTP_PORT || "";
+  if (!user)    user    = process.env.SMTP_USER || "";
+  if (!pass)    pass    = process.env.SMTP_PASS || "";
+  if (!to)      to      = process.env.SMTP_TO   || "";
+
+  const portNum = parseInt(portStr || "465") || 465;
   const isSecure = secure === "" ? portNum === 465 : secure === "1";
 
   return { host, port: portNum, user, pass, to, fromName, subject, cc, bcc, isSecure };
