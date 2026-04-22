@@ -25,12 +25,13 @@ const commonFields = [
 ];
 
 type TestState = "idle" | "loading" | "success" | "error";
-type Provider = "smtp" | "brevo" | "unisender";
+type Provider = "smtp" | "brevo" | "unisender" | "emailjs";
 
 const PROVIDERS: { id: Provider; label: string }[] = [
   { id: "smtp",      label: "SMTP" },
   { id: "brevo",     label: "Brevo API" },
   { id: "unisender", label: "Unisender" },
+  { id: "emailjs",   label: "EmailJS" },
 ];
 
 export default function AdminEmail() {
@@ -59,7 +60,8 @@ export default function AdminEmail() {
   const isSmtpOk      = !!(values["smtp_host"] && values["smtp_user"] && values["smtp_pass"]);
   const isBrevoOk     = !!(values["brevo_api_key"] && values["brevo_from_email"] && values["brevo_to"]);
   const isUnisenderOk = !!(values["unisender_api_key"] && values["unisender_from_email"] && values["unisender_to"]);
-  const isConfigured  = provider === "brevo" ? isBrevoOk : provider === "unisender" ? isUnisenderOk : isSmtpOk;
+  const isEmailJSOk   = !!(values["emailjs_service_id"] && values["emailjs_template_id"] && values["emailjs_public_key"]);
+  const isConfigured  = provider === "brevo" ? isBrevoOk : provider === "unisender" ? isUnisenderOk : provider === "emailjs" ? isEmailJSOk : isSmtpOk;
 
   const set = (key: string, val: string) => setValues((v) => ({ ...v, [key]: val }));
 
@@ -74,8 +76,11 @@ export default function AdminEmail() {
       } else if (provider === "brevo") {
         for (const k of ["brevo_api_key", "brevo_from_email", "brevo_to"])
           await apiRequest("PUT", `/api/settings/${k}`, { value: values[k] ?? "", category: "email" });
-      } else {
+      } else if (provider === "unisender") {
         for (const k of ["unisender_api_key", "unisender_from_email", "unisender_to", "unisender_list_id"])
+          await apiRequest("PUT", `/api/settings/${k}`, { value: values[k] ?? "", category: "email" });
+      } else {
+        for (const k of ["emailjs_service_id", "emailjs_template_id", "emailjs_public_key", "emailjs_private_key"])
           await apiRequest("PUT", `/api/settings/${k}`, { value: values[k] ?? "", category: "email" });
       }
 
@@ -111,12 +116,14 @@ export default function AdminEmail() {
 
   const statusText = () => {
     if (!isConfigured) {
-      if (provider === "brevo") return "Brevo не настроен — заполните API ключ, email отправителя и получателя";
+      if (provider === "brevo")     return "Brevo не настроен — заполните API ключ, email отправителя и получателя";
       if (provider === "unisender") return "Unisender не настроен — заполните API ключ и адреса";
+      if (provider === "emailjs")   return "EmailJS не настроен — заполните Service ID, Template ID и Public Key";
       return "SMTP не настроен — заполните сервер, email и пароль";
     }
     if (provider === "brevo")     return `Brevo настроен — письма будут приходить на ${values["brevo_to"]}`;
     if (provider === "unisender") return `Unisender настроен — письма будут приходить на ${values["unisender_to"]}`;
+    if (provider === "emailjs")   return "EmailJS настроен — письма отправляются через ваш шаблон";
     return `SMTP настроен — письма будут приходить на ${values["smtp_to"] || values["smtp_user"] || "указанный адрес"}`;
   };
 
@@ -282,6 +289,51 @@ export default function AdminEmail() {
                 <Input type="text" placeholder="1" value={values["unisender_list_id"] || ""}
                   onChange={(e) => set("unisender_list_id", e.target.value)} />
                 <p className="text-xs text-muted-foreground mt-1">Найдите в Списки контактов — номер в адресной строке</p>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {provider === "emailjs" && (
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-base">EmailJS</CardTitle>
+              <CardDescription>Отправка через ваш шаблон на emailjs.com</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="rounded-md bg-blue-50 border border-blue-200 p-3 text-sm text-blue-800">
+                <p className="font-medium mb-1">Как настроить:</p>
+                <ol className="list-decimal ml-4 space-y-1 text-xs">
+                  <li>Зарегистрируйтесь на <strong>emailjs.com</strong> (бесплатно, 200 писем/месяц)</li>
+                  <li>Add New Service → подключите вашу почту</li>
+                  <li>Email Templates → создайте шаблон с переменными: <code className="bg-blue-100 px-1 rounded">{"{{name}}"}</code> <code className="bg-blue-100 px-1 rounded">{"{{phone}}"}</code> <code className="bg-blue-100 px-1 rounded">{"{{message}}"}</code></li>
+                  <li>Account → API Keys → скопируйте Public и Private ключи</li>
+                </ol>
+                <a href="https://dashboard.emailjs.com" target="_blank" rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1 mt-2 text-blue-700 underline text-xs">
+                  Открыть EmailJS <ExternalLink className="h-3 w-3" />
+                </a>
+              </div>
+              <div>
+                <label className="text-sm font-medium mb-1.5 block">Service ID</label>
+                <Input placeholder="service_xxxxxxx" value={values["emailjs_service_id"] || ""}
+                  onChange={(e) => set("emailjs_service_id", e.target.value)} />
+              </div>
+              <div>
+                <label className="text-sm font-medium mb-1.5 block">Template ID</label>
+                <Input placeholder="template_xxxxxxx" value={values["emailjs_template_id"] || ""}
+                  onChange={(e) => set("emailjs_template_id", e.target.value)} />
+              </div>
+              <div>
+                <label className="text-sm font-medium mb-1.5 block">Public Key</label>
+                <Input placeholder="xxxxxxxxxxxxxxxxxxxx" value={values["emailjs_public_key"] || ""}
+                  onChange={(e) => set("emailjs_public_key", e.target.value)} />
+              </div>
+              <div>
+                <label className="text-sm font-medium mb-1.5 block">Private Key</label>
+                <Input type="password" placeholder="••••••••••••••••••••" value={values["emailjs_private_key"] || ""}
+                  onChange={(e) => set("emailjs_private_key", e.target.value)} autoComplete="new-password" />
+                <p className="text-xs text-muted-foreground mt-1">Account → API Keys → Private Key (для серверной отправки)</p>
               </div>
             </CardContent>
           </Card>

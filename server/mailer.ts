@@ -34,14 +34,30 @@ export async function getSmtpConfig() {
   return { host, port: portNum, user, pass, to, fromName, subject, cc, bcc, isSecure };
 }
 
-export async function getEmailProvider(): Promise<"smtp" | "brevo" | "unisender"> {
+export async function getEmailProvider(): Promise<"smtp" | "brevo" | "unisender" | "emailjs"> {
   try {
     const settings = await storage.getSettings();
     const val = settings.find((s) => s.key === "email_provider")?.value;
     if (val === "brevo") return "brevo";
     if (val === "unisender") return "unisender";
+    if (val === "emailjs") return "emailjs";
   } catch {}
   return "smtp";
+}
+
+async function getEmailJSConfig() {
+  try {
+    const settings = await storage.getSettings();
+    const get = (key: string) => settings.find((s) => s.key === key)?.value || "";
+    return {
+      serviceId:  get("emailjs_service_id"),
+      templateId: get("emailjs_template_id"),
+      publicKey:  get("emailjs_public_key"),
+      privateKey: get("emailjs_private_key"),
+    };
+  } catch {
+    return { serviceId: "", templateId: "", publicKey: "", privateKey: "" };
+  }
 }
 
 async function getBrevoConfig() {
@@ -136,6 +152,31 @@ async function sendViaUnisender(opts: {
   }
   if (!resp.ok) {
     throw new Error(`Unisender ошибка ${resp.status}`);
+  }
+}
+
+async function sendViaEmailJS(opts: {
+  serviceId: string; templateId: string;
+  publicKey: string; privateKey: string;
+  templateParams: Record<string, string>;
+}) {
+  const body = {
+    service_id:      opts.serviceId,
+    template_id:     opts.templateId,
+    user_id:         opts.publicKey,
+    accessToken:     opts.privateKey,
+    template_params: opts.templateParams,
+  };
+
+  const resp = await fetch("https://api.emailjs.com/api/v1.0/email/send", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+
+  if (!resp.ok) {
+    const text = await resp.text();
+    throw new Error(`EmailJS ошибка ${resp.status}: ${text}`);
   }
 }
 
@@ -234,6 +275,27 @@ export async function sendInquiryEmail(inquiry: {
     return;
   }
 
+  if (provider === "emailjs") {
+    const cfg = await getEmailJSConfig();
+    if (!cfg.serviceId || !cfg.templateId || !cfg.publicKey) {
+      console.log("[mailer] EmailJS не настроен"); return;
+    }
+    try {
+      await sendViaEmailJS({
+        serviceId: cfg.serviceId, templateId: cfg.templateId,
+        publicKey: cfg.publicKey, privateKey: cfg.privateKey,
+        templateParams: {
+          name:    inquiry.fio,
+          phone:   inquiry.phone,
+          email:   inquiry.email || "",
+          message: inquiry.message || "",
+        },
+      });
+      console.log(`[mailer][emailjs] заявка от ${inquiry.fio} отправлена`);
+    } catch (e: any) { console.error("[mailer][emailjs]", e.message); }
+    return;
+  }
+
   // SMTP
   const config = await getSmtpConfig();
   const transport = await createSmtpTransport();
@@ -286,6 +348,24 @@ export async function sendTestEmail(): Promise<void> {
       subject: "Тест — Email уведомления Woodiny",
       html: testHtml("Unisender API"),
       listId: cfg.listId,
+    });
+    return;
+  }
+
+  if (provider === "emailjs") {
+    const cfg = await getEmailJSConfig();
+    if (!cfg.serviceId)  throw new Error("EmailJS: Service ID не заполнен.");
+    if (!cfg.templateId) throw new Error("EmailJS: Template ID не заполнен.");
+    if (!cfg.publicKey)  throw new Error("EmailJS: Public Key не заполнен.");
+    await sendViaEmailJS({
+      serviceId: cfg.serviceId, templateId: cfg.templateId,
+      publicKey: cfg.publicKey, privateKey: cfg.privateKey,
+      templateParams: {
+        name:    "Тест",
+        phone:   "+7 000 000-00-00",
+        email:   "test@woodiny.ru",
+        message: "Это тестовое письмо из панели администратора Woodiny.",
+      },
     });
     return;
   }
